@@ -13,6 +13,17 @@
         </div>
 
         <div class="flex items-center gap-3">
+          <button
+            v-if="selectedEvent && (selectedEvent.status === 'rescheduled' || selectedEvent.reschedule_notice)"
+            @click="showBroadcastModal = true"
+            type="button"
+            class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-1.5 transition-all shadow-md shadow-amber-950/50"
+            title="Copy WhatsApp Reschedule Announcement Template"
+          >
+            <MessageSquare class="w-4 h-4" />
+            <span>Reschedule WhatsApp Broadcast</span>
+          </button>
+
           <a
             v-if="selectedEvent"
             :href="route('admin.registrations.export', selectedEvent.id)"
@@ -206,17 +217,80 @@
           :per-page-options="[10, 25, 50, 100, 'all']"
         />
       </div>
+
+      <!-- Reschedule WhatsApp Broadcast Modal -->
+      <div
+        v-if="showBroadcastModal && selectedEvent"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      >
+        <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-lg w-full border-2 border-amber-500/50 light:border-amber-300 shadow-2xl space-y-4 bg-slate-950 light:bg-white relative">
+          <button
+            @click="showBroadcastModal = false"
+            class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-900 light:bg-slate-100"
+          >
+            <X class="w-5 h-5" />
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
+              <MessageSquare class="w-5 h-5" />
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white light:text-slate-900 font-heading">
+                Template Broadcast WhatsApp Reschedule
+              </h3>
+              <p class="text-xs text-slate-400 light:text-slate-600">
+                Pesan siap kirim untuk menginformasikan jadwal baru kepada para tamu RSVP.
+              </p>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-900 light:bg-slate-100 border border-slate-800 light:border-slate-200">
+            <textarea
+              readonly
+              rows="9"
+              :value="whatsappTemplateText"
+              class="w-full bg-transparent text-xs text-slate-200 light:text-slate-800 font-mono focus:outline-none resize-none leading-relaxed"
+            ></textarea>
+          </div>
+
+          <div class="flex items-center justify-between gap-3 pt-2">
+            <span v-if="copied" class="text-xs text-teal-400 font-bold flex items-center gap-1">
+              ✓ Teks berhasil disalin ke clipboard!
+            </span>
+            <span v-else></span>
+
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                @click="showBroadcastModal = false"
+                class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-800 light:bg-slate-200 text-slate-300 light:text-slate-700"
+              >
+                Tutup
+              </button>
+              <button
+                type="button"
+                @click="copyWhatsAppTemplate"
+                class="px-5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 text-slate-950 shadow-md flex items-center gap-1.5"
+              >
+                <Copy class="w-4 h-4" />
+                <span>{{ copied ? 'Disalin!' : 'Salin Pesan' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </AdminLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AdminLayout from '../../../Layouts/AdminLayout.vue';
 import Pagination from '../../../Components/Pagination.vue';
 import { formatDate } from '../../../Utils/date';
-import { Download, QrCode, Search, Trash2 } from 'lucide-vue-next';
+import { Download, QrCode, Search, Trash2, MessageSquare, Copy, X } from 'lucide-vue-next';
 
 const props = defineProps({
   events: {
@@ -276,5 +350,30 @@ const handleSearch = () => {
 const clearSearch = () => {
   search.value = '';
   applyFilters();
+};
+
+const showBroadcastModal = ref(false);
+const copied = ref(false);
+
+const whatsappTemplateText = computed(() => {
+  if (!props.selectedEvent) return '';
+  const ev = props.selectedEvent;
+  const reason = ev.reschedule_notice || 'Sehubungan dengan penyesuaian operasional dan jadwal manajemen.';
+  const newDate = formatDate(ev.date);
+  const time = `${ev.start_time || '10:00'} ${ev.timezone || 'WIB'}`;
+  const venue = ev.venue_name || 'Showroom PT Hartono Raya Motor';
+  const url = `https://events.hartonomotor-group.com/events/${ev.slug}`;
+
+  return `*PEMBERITAHUAN PENJADWALAN ULANG ACARA (RESCHEDULE)*\nKepada Yth. Tamu Undangan ${ev.title},\n\nKami dari panitia Hartono Raya Motor / Hartono Group menginformasikan bahwa sehubungan dengan:\n"${reason}"\n\nAcara resmi dijadwalkan ulang menjadi:\n📅 Tanggal Baru: ${newDate}\n⏰ Waktu: ${time}\n📍 Lokasi: ${venue}\n\n*PENTING:* E-Tiket & Kode QR registrasi yang telah Anda terima tetap SAH dan dapat langsung digunakan untuk check-in pada hari acara.\n\nDetail Acara & E-Tiket:\n${url}\n\nTerima kasih atas pengertian dan kerja sama Anda.\nSalam hangat,\n*Panitia Hartono Group Events*`;
+});
+
+const copyWhatsAppTemplate = async () => {
+  try {
+    await navigator.clipboard.writeText(whatsappTemplateText.value);
+    copied.value = true;
+    setTimeout(() => {
+      copied.value = false;
+    }, 3000);
+  } catch (e) {}
 };
 </script>

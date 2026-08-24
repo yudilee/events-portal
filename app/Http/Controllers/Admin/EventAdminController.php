@@ -67,7 +67,9 @@ class EventAdminController extends Controller
             'rsvp_phone' => 'nullable|string|max:50',
             'max_capacity' => 'required|integer|min:1',
             'registration_deadline' => 'nullable|date',
-            'status' => 'required|string|in:draft,published,ongoing,completed,archived',
+            'status' => 'required|string|in:draft,published,rescheduled,ongoing,completed,archived',
+            'reschedule_notice' => 'nullable|string',
+            'original_date' => 'nullable|date',
             'is_registration_enabled' => 'boolean',
             'is_guestbook_enabled' => 'boolean',
             'is_gallery_enabled' => 'boolean',
@@ -138,13 +140,19 @@ class EventAdminController extends Controller
             'rsvp_phone' => 'nullable|string|max:50',
             'max_capacity' => 'required|integer|min:1',
             'registration_deadline' => 'nullable|date',
-            'status' => 'required|string|in:draft,published,ongoing,completed,archived',
+            'status' => 'required|string|in:draft,published,rescheduled,ongoing,completed,archived',
+            'reschedule_notice' => 'nullable|string',
+            'original_date' => 'nullable|date',
             'is_registration_enabled' => 'boolean',
             'is_guestbook_enabled' => 'boolean',
             'is_gallery_enabled' => 'boolean',
             'is_post_event_enabled' => 'boolean',
             'agendas' => 'nullable|array',
         ]);
+
+        if ($validated['status'] === 'rescheduled' && empty($event->original_date)) {
+            $validated['original_date'] = $event->date;
+        }
 
         $agendasData = $validated['agendas'] ?? [];
         unset($validated['agendas']);
@@ -170,6 +178,32 @@ class EventAdminController extends Controller
         }
 
         return redirect()->route('admin.events.index')->with('success', 'Event updated successfully!');
+    }
+
+    public function reschedule(Request $request, int $id): RedirectResponse
+    {
+        $event = Event::findOrFail($id);
+
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'start_time' => 'required|string',
+            'end_time' => 'nullable|string',
+            'venue_name' => 'required|string|max:255',
+            'venue_address' => 'nullable|string',
+            'venue_map_url' => 'nullable|string',
+            'registration_deadline' => 'nullable|date',
+            'reschedule_notice' => 'required|string|max:1000',
+        ]);
+
+        if (empty($event->original_date)) {
+            $validated['original_date'] = $event->date;
+        }
+
+        $validated['status'] = 'rescheduled';
+
+        $event->update($validated);
+
+        return back()->with('success', "Event '{$event->title}' has been successfully rescheduled to " . \Carbon\Carbon::parse($validated['date'])->format('d M Y') . ".");
     }
 
     public function destroy(int $id): RedirectResponse

@@ -209,14 +209,71 @@
               <label class="text-xs font-semibold text-slate-200 light:text-slate-700">Publish Status *</label>
               <select
                 v-model="form.status"
-                class="w-full px-4 py-2.5 rounded-xl bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 text-sm text-white light:text-slate-900 focus:outline-none focus:border-teal-400"
+                class="w-full px-4 py-2.5 rounded-xl bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 text-sm text-white light:text-slate-900 focus:outline-none focus:border-teal-400 font-medium"
               >
-                <option value="published">Published</option>
+                <option value="published">Published (Active)</option>
+                <option value="rescheduled">⚠️ Rescheduled / Postponed</option>
                 <option value="ongoing">Ongoing</option>
                 <option value="completed">Completed</option>
                 <option value="draft">Draft</option>
                 <option value="archived">Archived</option>
               </select>
+            </div>
+          </div>
+
+          <!-- Event Rescheduling & Postponement Notice (Shown when status is rescheduled or notice exists) -->
+          <div
+            v-if="form.status === 'rescheduled' || form.reschedule_notice"
+            class="p-5 rounded-2xl bg-amber-950/30 light:bg-amber-50 border-2 border-amber-500/50 light:border-amber-300 space-y-4 animate-in fade-in duration-200"
+          >
+            <div class="flex items-start gap-3">
+              <div class="p-2 rounded-xl bg-amber-500/20 text-amber-400 light:text-amber-700 shrink-0">
+                <AlertTriangle class="w-5 h-5" />
+              </div>
+              <div class="space-y-1">
+                <h4 class="text-sm font-bold text-amber-300 light:text-amber-900 font-heading">
+                  Event Rescheduled / Postponed Announcement
+                </h4>
+                <p class="text-xs text-amber-200/80 light:text-amber-800 leading-relaxed">
+                  This announcement will be displayed prominently at the top of the event website, ticket wallet, and digital guestbook. All registered attendees' QR passes remain valid for the new date.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-amber-300 light:text-amber-900 mb-1">
+                  Original Event Date (Before Reschedule)
+                </label>
+                <input
+                  v-model="form.original_date"
+                  type="date"
+                  class="w-full px-4 py-2.5 rounded-xl bg-slate-900 light:bg-white border border-amber-700/60 light:border-amber-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-amber-300 light:text-amber-900 mb-1">
+                  New Event Date
+                </label>
+                <input
+                  v-model="form.date"
+                  type="date"
+                  class="w-full px-4 py-2.5 rounded-xl bg-slate-900 light:bg-white border border-amber-700/60 light:border-amber-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-amber-300 light:text-amber-900 mb-1">
+                Official Reschedule Reason / Announcement Message *
+              </label>
+              <textarea
+                v-model="form.reschedule_notice"
+                rows="3"
+                placeholder="Contoh: Sehubungan dengan penyempurnaan fasilitas showroom dan penyesuaian agenda manajemen, acara dijadwalkan ulang menjadi tanggal..."
+                class="w-full p-3 rounded-xl bg-slate-900 light:bg-white border border-amber-700/60 light:border-amber-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-amber-400 leading-relaxed"
+              ></textarea>
             </div>
           </div>
 
@@ -456,6 +513,8 @@ const form = useForm({
   max_capacity: props.event?.max_capacity || 150,
   registration_deadline: props.event?.registration_deadline || null,
   status: props.event?.status || 'published',
+  reschedule_notice: props.event?.reschedule_notice || '',
+  original_date: props.event?.original_date || '',
   is_registration_enabled: props.event?.is_registration_enabled ?? true,
   is_guestbook_enabled: props.event?.is_guestbook_enabled ?? true,
   is_gallery_enabled: props.event?.is_gallery_enabled ?? true,

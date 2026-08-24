@@ -36,6 +36,8 @@ class Event extends Model
         'registration_deadline',
         'hero_image',
         'status',
+        'reschedule_notice',
+        'original_date',
         'is_registration_enabled',
         'is_guestbook_enabled',
         'is_gallery_enabled',
@@ -46,6 +48,7 @@ class Event extends Model
 
     protected $casts = [
         'date' => 'date:Y-m-d',
+        'original_date' => 'date:Y-m-d',
         'registration_deadline' => 'datetime:Y-m-d H:i',
         'post_event_published_at' => 'datetime:Y-m-d H:i',
         'is_registration_enabled' => 'boolean',
@@ -57,11 +60,23 @@ class Event extends Model
 
     protected $appends = [
         'formatted_date',
+        'formatted_original_date',
+        'is_rescheduled',
     ];
 
     public function getFormattedDateAttribute(): string
     {
         return $this->date ? \Carbon\Carbon::parse($this->date)->format('D, d M Y') : '';
+    }
+
+    public function getFormattedOriginalDateAttribute(): string
+    {
+        return $this->original_date ? \Carbon\Carbon::parse($this->original_date)->format('D, d M Y') : '';
+    }
+
+    public function getIsRescheduledAttribute(): bool
+    {
+        return $this->status === 'rescheduled' || !empty($this->reschedule_notice);
     }
 
     public function businessUnit(): BelongsTo
@@ -136,7 +151,12 @@ class Event extends Model
 
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('status', 'published');
+        return $query->whereIn('status', ['published', 'rescheduled', 'ongoing']);
+    }
+
+    public function scopeRescheduled(Builder $query): Builder
+    {
+        return $query->where('status', 'rescheduled')->orWhereNotNull('reschedule_notice');
     }
 
     public function scopeUpcoming(Builder $query): Builder

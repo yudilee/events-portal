@@ -12,6 +12,48 @@
           <span class="text-slate-200 light:text-slate-900 line-clamp-1 font-semibold">{{ event.title }}</span>
         </div>
 
+        <!-- Event Reschedule Urgent Announcement Banner -->
+        <div
+          v-if="event.status === 'rescheduled' || event.reschedule_notice"
+          class="mb-8 p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-amber-950/90 via-slate-950 to-amber-950/80 light:from-amber-50 light:to-amber-100 border-2 border-amber-500/70 light:border-amber-400 shadow-2xl shadow-amber-950/40 relative overflow-hidden"
+        >
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black shrink-0 shadow-md">
+                <CalendarClock class="w-6 h-6" />
+              </div>
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2.5 py-0.5 rounded-full text-[0.68rem] font-black uppercase tracking-widest bg-amber-500 text-slate-950">
+                    PEMBERITAHUAN RESCHEDULE
+                  </span>
+                  <span v-if="event.original_date" class="text-xs text-amber-300 light:text-amber-800 font-medium">
+                    (Jadwal Semula: <span class="line-through">{{ formatDate(event.original_date) }}</span>)
+                  </span>
+                </div>
+                <h3 class="text-base sm:text-lg font-black text-amber-200 light:text-amber-900 font-heading">
+                  Acara Ini Telah Dijadwalkan Ulang Menjadi: {{ formatDate(event.date) }} ({{ event.start_time }} {{ event.timezone }})
+                </h3>
+                <p class="text-xs sm:text-sm text-amber-100/90 light:text-amber-900 leading-relaxed max-w-3xl">
+                  {{ event.reschedule_notice }}
+                </p>
+                <div class="pt-1 text-[0.72rem] text-amber-300 light:text-amber-800 font-semibold flex items-center gap-1.5">
+                  <span>✓</span>
+                  <span>Seluruh E-Tiket & Kode QR Registrasi yang telah diterbitkan tetap berlaku untuk jadwal baru.</span>
+                </div>
+              </div>
+            </div>
+
+            <Link
+              v-if="event.is_registration_enabled && !event.is_full"
+              :href="route('public.events.register', event.slug)"
+              class="px-5 py-3 rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 transition-all shrink-0 shadow-lg shadow-amber-950/60 self-start md:self-auto"
+            >
+              RSVP Jadwal Baru &rarr;
+            </Link>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <div class="lg:col-span-8 space-y-6">
             <!-- Badges -->
@@ -270,6 +312,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '../../../Layouts/PublicLayout.vue';
 import CountdownTimer from '../../../Components/CountdownTimer.vue';
 import AgendaTimeline from '../../../Components/AgendaTimeline.vue';
+import { formatDate } from '../../../Utils/date';
 import {
   Calendar,
   Clock,
@@ -279,7 +322,8 @@ import {
   ExternalLink,
   Camera,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  CalendarClock
 } from 'lucide-vue-next';
 
 const props = defineProps({

@@ -6,18 +6,27 @@
       <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 via-cyan-400 to-transparent"></div>
 
       <div class="flex items-center justify-between gap-3 mb-4">
-        <span
-          v-if="event.business_unit"
-          class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-teal-950/80 light:bg-teal-50 text-teal-300 light:text-teal-700 border border-teal-800/40 light:border-teal-200"
-        >
-          {{ event.business_unit.name }}
-        </span>
-        <span
-          v-else
-          class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-slate-800 light:bg-slate-100 text-slate-300 light:text-slate-700"
-        >
-          Corporate Gathering
-        </span>
+        <div class="flex items-center gap-2">
+          <span
+            v-if="event.status === 'rescheduled'"
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.65rem] font-black uppercase tracking-wider bg-amber-950/90 light:bg-amber-100 text-amber-300 light:text-amber-800 border border-amber-500/50 shadow-sm"
+          >
+            ⚠️ Rescheduled
+          </span>
+
+          <span
+            v-if="event.business_unit"
+            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-teal-950/80 light:bg-teal-50 text-teal-300 light:text-teal-700 border border-teal-800/40 light:border-teal-200"
+          >
+            {{ event.business_unit.name }}
+          </span>
+          <span
+            v-else
+            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-slate-800 light:bg-slate-100 text-slate-300 light:text-slate-700"
+          >
+            Corporate Gathering
+          </span>
+        </div>
 
         <!-- Dress Code Badge -->
         <span class="text-xs font-medium px-2.5 py-0.5 rounded-md bg-slate-800/80 light:bg-slate-100 text-slate-300 light:text-slate-700 border border-slate-700/50 light:border-slate-200">

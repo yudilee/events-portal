@@ -112,6 +112,7 @@ Route::middleware(['auth', 'role:admin,event_organizer'])->prefix('admin')->name
 
     // Events Management
     Route::resource('events', EventAdminController::class)->except(['destroy']);
+    Route::post('/events/{event}/reschedule', [EventAdminController::class, 'reschedule'])->name('events.reschedule');
 
     // Event Media Gallery Manager
     Route::get('/events/{event}/media', [EventMediaAdminController::class, 'index'])->name('events.media.index');

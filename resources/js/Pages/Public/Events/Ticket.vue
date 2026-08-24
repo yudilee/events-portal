@@ -96,6 +96,19 @@
 
         <!-- Ticket Body Details -->
         <div class="p-6 sm:p-8 space-y-6 bg-slate-950/90 print:bg-white">
+          <!-- Rescheduled Pass Notice Banner (If event was rescheduled) -->
+          <div
+            v-if="event.status === 'rescheduled' || event.reschedule_notice"
+            class="p-3.5 rounded-2xl bg-amber-950/80 light:bg-amber-50 border border-amber-500/60 print:border-black text-amber-200 print:text-black text-xs space-y-1"
+          >
+            <div class="font-bold flex items-center gap-1.5 text-amber-400 print:text-black uppercase text-[0.68rem] tracking-wider">
+              <span>⚠️ PEMBERITAHUAN: JADWAL ACARA DIUNDUR / RESCHEDULED</span>
+            </div>
+            <p class="text-[0.7rem] text-amber-100/90 print:text-black leading-relaxed">
+              Acara resmi dijadwalkan ulang menjadi <strong>{{ formatDate(event.date) }}</strong> pukul <strong>{{ event.start_time }} {{ event.timezone }}</strong>. Tiket & barcode QR di bawah ini tetap sah digunakan untuk check-in.
+            </p>
+          </div>
+
           <!-- Attendee Information Grid -->
           <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-xs">
             <div class="col-span-2 sm:col-span-1">
