@@ -87,6 +87,13 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Integrated Pagination Component -->
+        <Pagination
+          :pagination="users"
+          item-name="users"
+          :per-page-options="[10, 15, 25, 50, 'all']"
+        />
       </div>
 
       <!-- User Create/Edit Modal -->
@@ -188,6 +195,7 @@
 import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AdminLayout from '../../../Layouts/AdminLayout.vue';
+import Pagination from '../../../Components/Pagination.vue';
 import { Plus, Edit3, Trash2, X } from 'lucide-vue-next';
 
 defineProps({

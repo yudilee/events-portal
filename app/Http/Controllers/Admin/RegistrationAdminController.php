@@ -43,13 +43,18 @@ class RegistrationAdminController extends Controller
             });
         }
 
-        $registrations = $query->latest()->paginate(20);
+        $perPage = $request->input('per_page', 25);
+        if ($perPage === 'all' || (is_numeric($perPage) && (int)$perPage >= 9999)) {
+            $registrations = $query->latest()->paginate(99999)->withQueryString();
+        } else {
+            $registrations = $query->latest()->paginate(is_numeric($perPage) ? max(1, min(500, (int)$perPage)) : 25)->withQueryString();
+        }
 
         return Inertia::render('Admin/Registrations/Index', [
             'events' => $events,
             'selectedEvent' => $selectedEvent,
             'registrations' => $registrations,
-            'filters' => $request->only(['status', 'type', 'search']),
+            'filters' => $request->only(['status', 'type', 'search', 'per_page']),
         ]);
     }
 

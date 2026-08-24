@@ -14,8 +14,11 @@ use Inertia\Response;
 
 class EventAdminController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $perPage = $request->input('per_page', 15);
+        $perPageInt = ($perPage === 'all' || (is_numeric($perPage) && (int)$perPage >= 9999)) ? 99999 : (is_numeric($perPage) ? max(1, min(500, (int)$perPage)) : 15);
+
         $events = Event::with('businessUnit')
             ->withCount(['registrations as attendees_count' => function ($q) {
                 $q->whereIn('status', ['confirmed', 'attended']);
@@ -24,7 +27,8 @@ class EventAdminController extends Controller
                 $q->whereNotNull('checked_in_at');
             }])
             ->orderBy('date', 'desc')
-            ->paginate(15);
+            ->paginate($perPageInt)
+            ->withQueryString();
 
         return Inertia::render('Admin/Events/Index', [
             'events' => $events,

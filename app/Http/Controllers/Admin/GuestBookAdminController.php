@@ -23,7 +23,12 @@ class GuestBookAdminController extends Controller
             $query->where('event_id', $selectedEvent->id);
         }
 
-        $entries = $query->latest()->paginate(25);
+        $perPage = $request->input('per_page', 25);
+        if ($perPage === 'all' || (is_numeric($perPage) && (int)$perPage >= 9999)) {
+            $entries = $query->latest()->paginate(99999)->withQueryString();
+        } else {
+            $entries = $query->latest()->paginate(is_numeric($perPage) ? max(1, min(500, (int)$perPage)) : 25)->withQueryString();
+        }
 
         return Inertia::render('Admin/GuestBook/Index', [
             'events' => $events,

@@ -32,14 +32,14 @@
         </div>
       </div>
 
-      <!-- Filters & Search -->
-      <div class="glass-card rounded-2xl p-4 border border-slate-800 light:border-slate-200 bg-slate-900/60 light:bg-white flex flex-col md:flex-row gap-4 items-center justify-between shadow-md">
-        <!-- Event Switcher -->
-        <div class="w-full md:w-72">
+      <!-- Filters & Search Toolbar -->
+      <div class="glass-card rounded-2xl p-4 border border-slate-800 light:border-slate-200 bg-slate-900/60 light:bg-white flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between shadow-md">
+        <!-- Left: Event Switcher -->
+        <div class="w-full lg:w-72 shrink-0">
           <select
             v-model="selectedEventId"
-            @change="changeEvent"
-            class="w-full px-3.5 py-2 rounded-xl bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-teal-400"
+            @change="applyFilters"
+            class="w-full px-3.5 py-2 rounded-xl bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-teal-400 font-medium"
           >
             <option v-for="ev in events" :key="ev.id" :value="ev.id">
               {{ ev.title }} ({{ formatDate(ev.date) }})
@@ -47,20 +47,61 @@
           </select>
         </div>
 
-        <!-- Search Input -->
-        <div class="relative w-full md:w-72">
-          <Search class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            v-model="search"
-            @input="handleSearch"
-            type="text"
-            placeholder="Search by name, code, vehicle..."
-            class="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 text-xs text-white light:text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-400"
-          />
+        <!-- Middle & Right: Category Filter, Status Filter, and Search -->
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 flex-1 justify-end">
+          <!-- Attendee Type Filter -->
+          <div class="w-full sm:w-40 shrink-0">
+            <select
+              v-model="type"
+              @change="applyFilters"
+              class="w-full px-3 py-2 rounded-xl bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-teal-400"
+            >
+              <option value="">All Categories</option>
+              <option value="vip">VIP Guest</option>
+              <option value="media">Media / Press</option>
+              <option value="general">General Guest</option>
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="w-full sm:w-40 shrink-0">
+            <select
+              v-model="status"
+              @change="applyFilters"
+              class="w-full px-3 py-2 rounded-xl bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-teal-400"
+            >
+              <option value="">All Statuses</option>
+              <option value="attended">Attended / Checked In</option>
+              <option value="confirmed">Confirmed (Not Arrived)</option>
+              <option value="pending">Pending</option>
+              <option value="waitlist">Waitlist</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <!-- Search Input -->
+          <div class="relative w-full sm:w-64">
+            <Search class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              v-model="search"
+              @input="handleSearch"
+              type="text"
+              placeholder="Search name, code, vehicle..."
+              class="w-full pl-10 pr-8 py-2 rounded-xl bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 text-xs text-white light:text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-400"
+            />
+            <button
+              v-if="search"
+              @click="clearSearch"
+              type="button"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white light:hover:text-slate-900 text-xs p-1"
+            >
+              &times;
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Attendees Table -->
+      <!-- Attendees Table Card -->
       <div class="glass-card rounded-3xl overflow-hidden border border-slate-800 light:border-slate-200 bg-slate-900/60 light:bg-white shadow-xl">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs text-slate-300 light:text-slate-700">
@@ -75,6 +116,14 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-800/60 light:divide-slate-200">
+              <tr v-if="!registrations.data || registrations.data.length === 0">
+                <td colspan="6" class="px-6 py-12 text-center text-slate-400 light:text-slate-500">
+                  <div class="max-w-xs mx-auto space-y-2">
+                    <p class="text-sm font-semibold text-slate-300 light:text-slate-700">No registrations found</p>
+                    <p class="text-xs text-slate-500">Try adjusting your event selection, category filter, or search keywords.</p>
+                  </div>
+                </td>
+              </tr>
               <tr v-for="reg in registrations.data" :key="reg.id" class="hover:bg-slate-900/40 light:hover:bg-slate-50 transition-colors">
                 <td class="px-6 py-4">
                   <div class="font-mono text-teal-400 light:text-teal-700 font-bold">{{ reg.registration_code }}</div>
@@ -149,6 +198,13 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Integrated Pagination Component -->
+        <Pagination
+          :pagination="registrations"
+          item-name="guests"
+          :per-page-options="[10, 25, 50, 100, 'all']"
+        />
       </div>
     </div>
   </AdminLayout>
@@ -158,6 +214,7 @@
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AdminLayout from '../../../Layouts/AdminLayout.vue';
+import Pagination from '../../../Components/Pagination.vue';
 import { formatDate } from '../../../Utils/date';
 import { Download, QrCode, Search, Trash2 } from 'lucide-vue-next';
 
@@ -186,23 +243,38 @@ const deleteRegistration = (reg) => {
   }
 };
 
-const selectedEventId = ref(props.selectedEvent?.id || '');
+const selectedEventId = ref(props.selectedEvent?.id || (props.events.length > 0 ? props.events[0].id : ''));
 const search = ref(props.filters.search || '');
+const status = ref(props.filters.status || '');
+const type = ref(props.filters.type || '');
 
-const changeEvent = () => {
-  router.get(route('admin.events.registrations', selectedEventId.value));
+const applyFilters = () => {
+  const targetRoute = selectedEventId.value
+    ? route('admin.events.registrations', selectedEventId.value)
+    : route('admin.registrations.index');
+
+  router.get(targetRoute, {
+    search: search.value || undefined,
+    status: status.value || undefined,
+    type: type.value || undefined,
+    per_page: props.filters.per_page || undefined,
+  }, {
+    preserveState: true,
+    preserveScroll: true,
+    replace: true,
+  });
 };
 
 let searchTimeout = null;
 const handleSearch = () => {
   clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
-    router.get(route('admin.registrations.index'), {
-      search: search.value || undefined,
-    }, {
-      preserveState: true,
-      replace: true,
-    });
+    applyFilters();
   }, 300);
+};
+
+const clearSearch = () => {
+  search.value = '';
+  applyFilters();
 };
 </script>

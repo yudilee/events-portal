@@ -119,6 +119,13 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Integrated Pagination Component -->
+        <Pagination
+          :pagination="entries"
+          item-name="messages"
+          :per-page-options="[10, 25, 50, 100, 'all']"
+        />
       </div>
     </div>
   </AdminLayout>
@@ -128,6 +135,7 @@
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AdminLayout from '../../../Layouts/AdminLayout.vue';
+import Pagination from '../../../Components/Pagination.vue';
 import { formatDate } from '../../../Utils/date';
 import { Sparkles, Eye, EyeOff, Trash2 } from 'lucide-vue-next';
 

@@ -14,11 +14,15 @@ use Inertia\Response;
 
 class NewsAdminController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $perPage = $request->input('per_page', 15);
+        $perPageInt = ($perPage === 'all' || (is_numeric($perPage) && (int)$perPage >= 9999)) ? 99999 : (is_numeric($perPage) ? max(1, min(500, (int)$perPage)) : 15);
+
         $releases = PressRelease::with(['businessUnit', 'event'])
             ->latest('created_at')
-            ->paginate(15);
+            ->paginate($perPageInt)
+            ->withQueryString();
 
         return Inertia::render('Admin/News/Index', [
             'releases' => $releases,

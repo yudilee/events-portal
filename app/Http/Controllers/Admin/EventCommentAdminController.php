@@ -23,7 +23,12 @@ class EventCommentAdminController extends Controller
             $query->where('event_id', $selectedEventId);
         }
 
-        $comments = $query->paginate(20)->withQueryString();
+        $perPage = $request->input('per_page', 20);
+        if ($perPage === 'all' || (is_numeric($perPage) && (int)$perPage >= 9999)) {
+            $comments = $query->paginate(99999)->withQueryString();
+        } else {
+            $comments = $query->paginate(is_numeric($perPage) ? max(1, min(500, (int)$perPage)) : 20)->withQueryString();
+        }
 
         return Inertia::render('Admin/Wishes/Index', [
             'comments' => $comments,

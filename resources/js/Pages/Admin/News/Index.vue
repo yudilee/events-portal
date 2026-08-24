@@ -89,6 +89,13 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Integrated Pagination Component -->
+        <Pagination
+          :pagination="releases"
+          item-name="articles"
+          :per-page-options="[10, 15, 25, 50, 'all']"
+        />
       </div>
     </div>
   </AdminLayout>
@@ -97,6 +104,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import AdminLayout from '../../../Layouts/AdminLayout.vue';
+import Pagination from '../../../Components/Pagination.vue';
 import { Plus, Edit3, Trash2 } from 'lucide-vue-next';
 
 defineProps({

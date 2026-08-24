@@ -29,11 +29,16 @@ class UserAdminController extends Controller
             });
         }
 
-        $users = $query->latest()->paginate(15);
+        $perPage = $request->input('per_page', 15);
+        if ($perPage === 'all' || (is_numeric($perPage) && (int)$perPage >= 9999)) {
+            $users = $query->latest()->paginate(99999)->withQueryString();
+        } else {
+            $users = $query->latest()->paginate(is_numeric($perPage) ? max(1, min(500, (int)$perPage)) : 15)->withQueryString();
+        }
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
-            'filters' => $request->only(['role', 'search']),
+            'filters' => $request->only(['role', 'search', 'per_page']),
         ]);
     }
 

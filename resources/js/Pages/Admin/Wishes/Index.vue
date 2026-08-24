@@ -115,6 +115,13 @@
             </div>
           </div>
         </div>
+
+        <!-- Integrated Pagination Component -->
+        <Pagination
+          :pagination="comments"
+          item-name="wishes"
+          :per-page-options="[10, 20, 50, 100, 'all']"
+        />
       </div>
     </div>
   </AdminLayout>
@@ -123,6 +130,7 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3';
 import AdminLayout from '../../../Layouts/AdminLayout.vue';
+import Pagination from '../../../Components/Pagination.vue';
 import {
   Star,
   Check,
