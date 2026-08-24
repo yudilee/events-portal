@@ -44,8 +44,10 @@ Route::get('/events/{slug}/ticket/{code}', [EventController::class, 'ticket'])->
 Route::post('/events/{slug}/comments', [EventCommentController::class, 'store'])->name('public.events.comments.store');
 Route::post('/comments/{comment}/like', [EventCommentController::class, 'like'])->name('public.comments.like');
 
-// Guestbook
+// Guestbook Public, Reception Kiosk & QR Standee
 Route::get('/events/{slug}/guestbook', [GuestBookController::class, 'show'])->name('public.events.guestbook');
+Route::get('/events/{slug}/guestbook/kiosk', [GuestBookController::class, 'kiosk'])->name('public.events.guestbook.kiosk');
+Route::get('/events/{slug}/guestbook/qr', [GuestBookController::class, 'qrStandee'])->name('public.events.guestbook.qr');
 Route::post('/events/{slug}/guestbook', [GuestBookController::class, 'store'])->name('public.events.guestbook.store');
 
 // News & Media Kit

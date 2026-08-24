@@ -24,13 +24,33 @@
           </p>
         </div>
 
-        <button
-          @click="showFormModal = true"
-          class="px-6 py-3 rounded-2xl font-bold text-xs bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-slate-950 shadow-xl shadow-teal-950/60 transition-all flex items-center gap-2 self-start md:self-auto"
-        >
-          <PenTool class="w-4 h-4" />
-          <span>Sign Digital Guest Book</span>
-        </button>
+        <div class="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
+          <Link
+            :href="route('public.events.guestbook.qr', event.slug)"
+            class="px-4 py-3 rounded-2xl font-bold text-xs bg-slate-900 light:bg-slate-100 hover:bg-slate-800 text-cyan-400 light:text-cyan-700 border border-slate-700 light:border-slate-300 transition-all flex items-center gap-2 shadow-sm"
+            title="Open QR Code for Mobile Scanning"
+          >
+            <QrCode class="w-4 h-4" />
+            <span>QR Standee</span>
+          </Link>
+
+          <Link
+            :href="route('public.events.guestbook.kiosk', event.slug)"
+            class="px-4 py-3 rounded-2xl font-bold text-xs bg-slate-900 light:bg-slate-100 hover:bg-slate-800 text-teal-400 light:text-teal-700 border border-slate-700 light:border-slate-300 transition-all flex items-center gap-2 shadow-sm"
+            title="Open Reception Tablet Kiosk Mode"
+          >
+            <Tablet class="w-4 h-4" />
+            <span>Tablet Kiosk Mode</span>
+          </Link>
+
+          <button
+            @click="showFormModal = true"
+            class="px-6 py-3 rounded-2xl font-bold text-xs bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-slate-950 shadow-xl shadow-teal-950/60 transition-all flex items-center gap-2"
+          >
+            <PenTool class="w-4 h-4" />
+            <span>Sign Guest Book</span>
+          </button>
+        </div>
       </div>
 
       <!-- Live Messages Masonry Grid -->
@@ -172,7 +192,9 @@ import {
   PenTool,
   Sparkles,
   MessageSquareDashed,
-  X
+  X,
+  Tablet,
+  QrCode
 } from 'lucide-vue-next';
 
 const props = defineProps({

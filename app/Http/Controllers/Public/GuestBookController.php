@@ -29,6 +29,54 @@ class GuestBookController extends Controller
         ]);
     }
 
+    public function kiosk(string $slug): Response
+    {
+        $event = Event::with('businessUnit')->where('slug', $slug)->firstOrFail();
+
+        $recentEntries = GuestBookEntry::where('event_id', $event->id)
+            ->where('is_approved', true)
+            ->latest()
+            ->take(12)
+            ->get(['id', 'guest_name', 'company', 'message', 'created_at']);
+
+        $totalSigned = GuestBookEntry::where('event_id', $event->id)
+            ->where('is_approved', true)
+            ->count();
+
+        $qrUrl = route('public.events.guestbook.kiosk', $event->slug);
+
+        return Inertia::render('Public/Events/GuestbookKiosk', [
+            'event' => $event,
+            'recentEntries' => $recentEntries,
+            'totalSigned' => $totalSigned,
+            'qrUrl' => $qrUrl,
+        ]);
+    }
+
+    public function qrStandee(string $slug): Response
+    {
+        $event = Event::with('businessUnit')->where('slug', $slug)->firstOrFail();
+
+        $recentEntries = GuestBookEntry::where('event_id', $event->id)
+            ->where('is_approved', true)
+            ->latest()
+            ->take(15)
+            ->get(['id', 'guest_name', 'company', 'message', 'created_at']);
+
+        $totalSigned = GuestBookEntry::where('event_id', $event->id)
+            ->where('is_approved', true)
+            ->count();
+
+        $targetUrl = route('public.events.guestbook.kiosk', $event->slug);
+
+        return Inertia::render('Public/Events/GuestbookQrStandee', [
+            'event' => $event,
+            'recentEntries' => $recentEntries,
+            'totalSigned' => $totalSigned,
+            'targetUrl' => $targetUrl,
+        ]);
+    }
+
     public function store(Request $request, string $slug): RedirectResponse
     {
         $event = Event::where('slug', $slug)->firstOrFail();

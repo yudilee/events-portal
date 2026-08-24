@@ -4,7 +4,7 @@
 
     <div class="space-y-6 max-w-7xl">
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <span class="text-xs font-bold uppercase tracking-widest text-teal-400 light:text-teal-700">Live Moderation</span>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-white light:text-slate-900 font-heading mt-0.5">
@@ -12,16 +12,40 @@
           </h1>
         </div>
 
-        <div class="w-full sm:w-80">
-          <select
-            v-model="selectedEventId"
-            @change="changeEvent"
-            class="w-full px-3.5 py-2 rounded-xl bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-teal-400 font-medium"
-          >
-            <option v-for="ev in events" :key="ev.id" :value="ev.id">
-              {{ ev.title }} ({{ formatDate(ev.date) }})
-            </option>
-          </select>
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-3">
+          <div class="w-full sm:w-72">
+            <select
+              v-model="selectedEventId"
+              @change="changeEvent"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 light:bg-white border border-slate-700 light:border-slate-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-teal-400 font-medium"
+            >
+              <option v-for="ev in events" :key="ev.id" :value="ev.id">
+                {{ ev.title }} ({{ formatDate(ev.date) }})
+              </option>
+            </select>
+          </div>
+
+          <template v-if="selectedEvent">
+            <a
+              :href="route('public.events.guestbook.kiosk', selectedEvent.slug)"
+              target="_blank"
+              class="px-3.5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 text-slate-950 flex items-center gap-1.5 transition-all shadow-md shadow-teal-950/50 shrink-0"
+              title="Open Reception Tablet Kiosk Mode"
+            >
+              <Tablet class="w-4 h-4" />
+              <span>Launch iPad Kiosk</span>
+            </a>
+
+            <a
+              :href="route('public.events.guestbook.qr', selectedEvent.slug)"
+              target="_blank"
+              class="px-3.5 py-2.5 rounded-xl text-xs font-bold bg-slate-800 light:bg-slate-100 hover:bg-slate-700 text-cyan-400 light:text-cyan-700 border border-slate-700 light:border-slate-300 flex items-center gap-1.5 transition-colors shadow-sm shrink-0"
+              title="Open Reception QR Standee Display"
+            >
+              <QrCode class="w-4 h-4" />
+              <span>QR Standee</span>
+            </a>
+          </template>
         </div>
       </div>
 
@@ -137,7 +161,7 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import AdminLayout from '../../../Layouts/AdminLayout.vue';
 import Pagination from '../../../Components/Pagination.vue';
 import { formatDate } from '../../../Utils/date';
-import { Sparkles, Eye, EyeOff, Trash2 } from 'lucide-vue-next';
+import { Sparkles, Eye, EyeOff, Trash2, Tablet, QrCode } from 'lucide-vue-next';
 
 const props = defineProps({
   events: {
