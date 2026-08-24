@@ -49,6 +49,7 @@ Route::get('/events/{slug}/guestbook', [GuestBookController::class, 'show'])->na
 Route::get('/events/{slug}/guestbook/kiosk', [GuestBookController::class, 'kiosk'])->name('public.events.guestbook.kiosk');
 Route::get('/events/{slug}/guestbook/qr', [GuestBookController::class, 'qrStandee'])->name('public.events.guestbook.qr');
 Route::post('/events/{slug}/guestbook', [GuestBookController::class, 'store'])->name('public.events.guestbook.store');
+Route::post('/api/events/{slug}/lookup-ticket', [GuestBookController::class, 'lookupTicket'])->name('public.events.guestbook.lookup-ticket');
 
 // News & Media Kit
 Route::get('/news', [NewsController::class, 'index'])->name('public.news.index');

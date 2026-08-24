@@ -94,11 +94,22 @@ class GuestBookController extends Controller
 
         $registrationId = null;
         if (!empty($validated['registration_code'])) {
+            $c = trim($validated['registration_code']);
             $reg = Registration::where('event_id', $event->id)
-                ->where('registration_code', trim($validated['registration_code']))
+                ->where(function ($q) use ($c) {
+                    $q->where('registration_code', $c)
+                      ->orWhere('phone', $c)
+                      ->orWhere('email', $c);
+                })
                 ->first();
             if ($reg) {
                 $registrationId = $reg->id;
+                if (!$reg->checked_in_at) {
+                    $reg->update([
+                        'checked_in_at' => now(),
+                        'status' => 'attended',
+                    ]);
+                }
             }
         }
 
@@ -113,5 +124,47 @@ class GuestBookController extends Controller
         ]);
 
         return back()->with('success', 'Thank you! Your message has been posted on the event guestbook wall.');
+    }
+
+    public function lookupTicket(Request $request, string $slug): JsonResponse
+    {
+        $event = Event::where('slug', $slug)->firstOrFail();
+        $code = trim($request->input('code', ''));
+
+        if (preg_match('/ticket\/([A-Za-z0-9_-]+)/i', $code, $matches)) {
+            $code = $matches[1];
+        }
+
+        $registration = Registration::where('event_id', $event->id)
+            ->where(function ($q) use ($code) {
+                $q->where('registration_code', $code)
+                  ->orWhere('phone', $code)
+                  ->orWhere('email', $code);
+            })
+            ->first();
+
+        if (!$registration) {
+            return response()->json([
+                'success' => false,
+                'code' => $code,
+                'message' => "Ticket code '{$code}' not found for this event.",
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'registration' => [
+                'id' => $registration->id,
+                'full_name' => $registration->full_name,
+                'company' => $registration->company ?? '',
+                'email' => $registration->email ?? '',
+                'phone' => $registration->phone ?? '',
+                'registration_code' => $registration->registration_code,
+                'attendee_type' => $registration->attendee_type,
+                'vehicle_model' => $registration->vehicle_model,
+                'license_plate' => $registration->license_plate,
+                'checked_in' => !empty($registration->checked_in_at),
+            ],
+        ]);
     }
 }

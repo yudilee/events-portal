@@ -28,24 +28,25 @@
         </div>
       </div>
 
-      <!-- Right: Kiosk Tools (Fullscreen, QR Standee Mode, Theme) -->
+      <!-- Right: Kiosk Tools (Scan Ticket Quick Trigger, QR Standee Mode, Fullscreen) -->
       <div class="flex items-center gap-2">
+        <button
+          @click="openScannerModal"
+          type="button"
+          class="px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 text-slate-950 flex items-center gap-1.5 transition-all shadow-md shadow-teal-950/50"
+          title="Scan Ticket Barcode / QR Code"
+        >
+          <Camera class="w-4 h-4" />
+          <span>Scan Ticket QR</span>
+        </button>
+
         <Link
           :href="route('public.events.guestbook.qr', event.slug)"
           class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-900 light:bg-slate-100 hover:bg-slate-800 text-cyan-400 light:text-cyan-700 border border-slate-700 light:border-slate-300 flex items-center gap-1.5 transition-colors shadow-sm"
           title="Switch to QR Code Standee Display"
         >
           <QrCode class="w-4 h-4" />
-          <span class="hidden sm:inline">QR Standee Display</span>
-        </Link>
-
-        <Link
-          :href="route('public.events.guestbook', event.slug)"
-          class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-900 light:bg-slate-100 hover:bg-slate-800 text-slate-300 light:text-slate-700 border border-slate-700 light:border-slate-300 flex items-center gap-1.5 transition-colors shadow-sm"
-          title="View Public Wall"
-        >
-          <Sparkles class="w-4 h-4 text-amber-400" />
-          <span class="hidden sm:inline">Live Wall</span>
+          <span class="hidden sm:inline">QR Standee</span>
         </Link>
 
         <button
@@ -70,14 +71,71 @@
         <!-- Left Side: Guest Form Card (8 Cols) -->
         <div class="lg:col-span-7 glass-card rounded-3xl p-6 sm:p-8 border border-slate-800/90 light:border-slate-200 bg-slate-900/80 light:bg-white shadow-2xl flex flex-col justify-between">
           <div>
-            <div class="mb-6 space-y-1">
-              <span class="text-xs font-bold uppercase tracking-widest text-teal-400 light:text-teal-700">Digital Attendance</span>
+            <div class="mb-5 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-widest text-teal-400 light:text-teal-700">Digital Attendance</span>
+                <span v-if="verifiedAttendee" class="text-[0.68rem] font-bold text-teal-400 bg-teal-950/80 light:bg-teal-100 px-2 py-0.5 rounded-full border border-teal-800/50">
+                  ✓ Ticket Verified
+                </span>
+              </div>
               <h2 class="text-2xl sm:text-3xl font-black text-white light:text-slate-900 font-heading">
                 Sign Digital Guest Book
               </h2>
               <p class="text-xs text-slate-400 light:text-slate-600">
-                Please enter your details and greeting to check-in and enter the stage doorprize draw.
+                Scan your RSVP E-Ticket or enter your details manually to enter the live stage doorprize draw.
               </p>
+            </div>
+
+            <!-- Fast Camera Scan Trigger Banner -->
+            <div
+              v-if="!verifiedAttendee"
+              @click="openScannerModal"
+              class="mb-5 p-3.5 rounded-2xl bg-gradient-to-r from-teal-950/60 via-slate-900 to-cyan-950/60 light:from-teal-50 light:to-cyan-50 border border-teal-500/40 light:border-teal-300 flex items-center justify-between gap-3 cursor-pointer hover:border-teal-400 transition-all group shadow-md"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-teal-500 text-slate-950 flex items-center justify-center font-bold shadow-md group-hover:scale-105 transition-transform">
+                  <Camera class="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-white light:text-slate-900 group-hover:text-teal-300 light:group-hover:text-teal-700 transition-colors">
+                    Have an RSVP Ticket / QR Pass?
+                  </h4>
+                  <p class="text-[0.7rem] text-slate-400 light:text-slate-600">
+                    Tap to scan with camera & auto-fill your details instantly.
+                  </p>
+                </div>
+              </div>
+              <span class="px-3 py-1 rounded-xl bg-teal-500/20 light:bg-teal-100 text-teal-300 light:text-teal-800 text-xs font-bold shrink-0 border border-teal-500/30">
+                Scan Now &rarr;
+              </span>
+            </div>
+
+            <!-- Verified Attendee Banner -->
+            <div
+              v-else
+              class="mb-5 p-3.5 rounded-2xl bg-teal-950/80 light:bg-teal-50 border border-teal-500/60 light:border-teal-300 flex items-center justify-between gap-3"
+            >
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-teal-500 text-slate-950 flex items-center justify-center font-bold">
+                  <CheckCircle2 class="w-4 h-4" />
+                </div>
+                <div>
+                  <div class="text-xs font-black text-teal-300 light:text-teal-800">
+                    {{ verifiedAttendee.full_name }}
+                    <span v-if="verifiedAttendee.company" class="text-slate-300 light:text-slate-600 font-normal">({{ verifiedAttendee.company }})</span>
+                  </div>
+                  <div class="text-[0.68rem] text-teal-400 light:text-teal-700 font-mono">
+                    Pass: #{{ verifiedAttendee.registration_code }} • {{ verifiedAttendee.attendee_type?.toUpperCase() }} PASS
+                  </div>
+                </div>
+              </div>
+              <button
+                @click="clearScannedTicket"
+                type="button"
+                class="text-[0.7rem] text-rose-400 hover:text-rose-300 font-semibold px-2 py-1 bg-slate-900/60 light:bg-white rounded-lg border border-slate-700 light:border-slate-300"
+              >
+                Clear / Re-scan
+              </button>
             </div>
 
             <form @submit.prevent="submitForm" class="space-y-4">
@@ -124,9 +182,17 @@
                     <input
                       v-model="form.registration_code"
                       type="text"
-                      placeholder="e.g. HRM-VIP-2026 (Optional)"
-                      class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-950/80 light:bg-slate-50 border border-slate-700 light:border-slate-300 text-xs font-mono text-teal-400 light:text-teal-700 placeholder-slate-500 focus:outline-none focus:border-teal-400 uppercase"
+                      placeholder="e.g. HRM-VIP-2026"
+                      class="w-full pl-11 pr-14 py-3 rounded-xl bg-slate-950/80 light:bg-slate-50 border border-slate-700 light:border-slate-300 text-xs font-mono text-teal-400 light:text-teal-700 placeholder-slate-500 focus:outline-none focus:border-teal-400 uppercase"
                     />
+                    <button
+                      @click="openScannerModal"
+                      type="button"
+                      class="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-1 rounded-lg bg-teal-500/20 text-teal-300 hover:bg-teal-500 hover:text-slate-950 text-[0.65rem] font-bold transition-colors"
+                      title="Scan Ticket QR"
+                    >
+                      📷 Scan
+                    </button>
                   </div>
                 </div>
               </div>
@@ -138,10 +204,11 @@
                 </label>
                 <div class="relative">
                   <textarea
+                    id="guestbook-message-input"
                     v-model="form.message"
                     required
                     rows="3"
-                    placeholder="Tulis ucapan selamat atau harapan Anda..."
+                    placeholder="Tulis ucapan selamat atau harapan Anda untuk Hartono Group..."
                     class="w-full p-4 rounded-2xl bg-slate-950/80 light:bg-slate-50 border border-slate-700 light:border-slate-300 text-xs text-white light:text-slate-900 placeholder-slate-500 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-500/20 leading-relaxed"
                   ></textarea>
                 </div>
@@ -289,6 +356,78 @@
       </div>
     </main>
 
+    <!-- Camera QR Scanner Modal -->
+    <div
+      v-if="showScannerModal"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
+    >
+      <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-md w-full border-2 border-teal-500/50 light:border-teal-300 bg-slate-900 light:bg-white shadow-2xl relative space-y-4">
+        <button
+          @click="closeScannerModal"
+          class="absolute top-4 right-4 text-slate-400 light:text-slate-600 hover:text-white light:hover:text-black p-1 rounded-lg bg-slate-800/80 light:bg-slate-200 transition-colors z-20"
+        >
+          <X class="w-5 h-5" />
+        </button>
+
+        <div class="text-center space-y-1">
+          <span class="text-xs font-bold uppercase tracking-widest text-teal-400 light:text-teal-700">Camera Scanner</span>
+          <h3 class="text-xl font-bold text-white light:text-slate-900 font-heading">
+            Scan Your Ticket QR Pass
+          </h3>
+          <p class="text-xs text-slate-400 light:text-slate-600">
+            Hold your mobile E-Ticket or printed QR pass in front of the camera.
+          </p>
+        </div>
+
+        <!-- Scanner Viewfinder Box -->
+        <div class="relative rounded-2xl overflow-hidden bg-black border-2 border-teal-500/40 aspect-square flex items-center justify-center">
+          <div id="kiosk-ticket-reader" class="w-full h-full"></div>
+
+          <!-- Scanning Visual Reticle -->
+          <div class="absolute inset-0 pointer-events-none border-2 border-teal-400/30 rounded-2xl flex items-center justify-center">
+            <div class="w-48 h-48 border-2 border-dashed border-teal-400/80 rounded-2xl relative animate-pulse">
+              <!-- Scanning Laser Line -->
+              <div class="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent top-1/2 -translate-y-1/2 animate-bounce"></div>
+            </div>
+          </div>
+
+          <!-- Loading / Searching Overlay -->
+          <div
+            v-if="isVerifyingTicket"
+            class="absolute inset-0 bg-black/80 flex flex-col items-center justify-center space-y-2 z-10"
+          >
+            <div class="w-8 h-8 border-3 border-teal-400 border-t-transparent rounded-full animate-spin"></div>
+            <span class="text-xs font-bold text-teal-300 font-mono">Verifying Ticket...</span>
+          </div>
+        </div>
+
+        <!-- Scan Status Feedback -->
+        <div v-if="scannerErrorMessage" class="p-3 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300 text-xs text-center font-medium">
+          {{ scannerErrorMessage }}
+        </div>
+
+        <!-- Camera Switch & Cancel Controls -->
+        <div class="flex items-center gap-2 pt-1">
+          <button
+            @click="switchCamera"
+            type="button"
+            class="flex-1 py-2.5 rounded-xl bg-slate-800 light:bg-slate-200 hover:bg-slate-700 light:hover:bg-slate-300 text-slate-200 light:text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors border border-slate-700 light:border-slate-300"
+          >
+            <RefreshCw class="w-3.5 h-3.5" />
+            <span>Switch Camera ({{ currentFacingMode === 'user' ? 'Front' : 'Back' }})</span>
+          </button>
+
+          <button
+            @click="closeScannerModal"
+            type="button"
+            class="py-2.5 px-4 rounded-xl bg-slate-800 light:bg-slate-200 hover:bg-slate-700 text-slate-300 light:text-slate-700 text-xs font-semibold"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Bottom Kiosk Footer Bar -->
     <footer class="p-4 border-t border-slate-800/60 light:border-slate-200 bg-slate-950/50 light:bg-slate-100/50 text-[0.7rem] text-slate-400 light:text-slate-600 flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0 z-20">
       <div class="flex items-center gap-2 font-medium">
@@ -304,9 +443,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import axios from 'axios';
 import confetti from 'canvas-confetti';
+import { Html5Qrcode } from 'html5-qrcode';
 import { formatDate } from '../../../Utils/date';
 import {
   BookOpen,
@@ -318,7 +459,10 @@ import {
   Maximize,
   Minimize,
   CheckCircle2,
-  UserPlus
+  UserPlus,
+  Camera,
+  X,
+  RefreshCw
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -347,6 +491,13 @@ const countdownSeconds = ref(6);
 const totalSignedCount = ref(props.totalSigned);
 const localRecentEntries = ref([...props.recentEntries]);
 
+// Scanner State
+const showScannerModal = ref(false);
+const isVerifyingTicket = ref(false);
+const scannerErrorMessage = ref('');
+const verifiedAttendee = ref(null);
+const currentFacingMode = ref('environment'); // 'user' (front) or 'environment' (back)
+let html5QrCode = null;
 let countdownTimer = null;
 
 const quickChips = [
@@ -371,6 +522,22 @@ const applyChip = (chip) => {
   }
 };
 
+const playBeep = (isSuccess) => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = isSuccess ? 'sine' : 'sawtooth';
+    osc.frequency.setValueAtTime(isSuccess ? 880 : 300, ctx.currentTime);
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.3);
+  } catch (e) {}
+};
+
 const triggerConfetti = () => {
   try {
     confetti({
@@ -379,9 +546,95 @@ const triggerConfetti = () => {
       origin: { y: 0.6 },
       colors: ['#2dd4bf', '#22d3ee', '#38bdf8', '#f59e0b'],
     });
-  } catch (e) {
-    // Ignore if not supported
+  } catch (e) {}
+};
+
+// Open Scanner Modal
+const openScannerModal = async () => {
+  showScannerModal.value = true;
+  scannerErrorMessage.value = '';
+  isVerifyingTicket.value = false;
+
+  await nextTick();
+  startCamera();
+};
+
+const startCamera = async () => {
+  try {
+    if (html5QrCode) {
+      try { await html5QrCode.stop(); } catch (e) {}
+    }
+
+    html5QrCode = new Html5Qrcode('kiosk-ticket-reader');
+    await html5QrCode.start(
+      { facingMode: currentFacingMode.value },
+      { fps: 10, qrbox: { width: 220, height: 220 } },
+      async (decodedText) => {
+        await handleScannedCode(decodedText);
+      },
+      () => {}
+    );
+  } catch (err) {
+    scannerErrorMessage.value = 'Camera permission denied or camera not available.';
   }
+};
+
+const switchCamera = async () => {
+  currentFacingMode.value = currentFacingMode.value === 'environment' ? 'user' : 'environment';
+  await startCamera();
+};
+
+const closeScannerModal = async () => {
+  if (html5QrCode) {
+    try {
+      await html5QrCode.stop();
+      html5QrCode = null;
+    } catch (e) {}
+  }
+  showScannerModal.value = false;
+};
+
+const handleScannedCode = async (code) => {
+  if (isVerifyingTicket.value) return;
+  isVerifyingTicket.value = true;
+  scannerErrorMessage.value = '';
+
+  try {
+    const response = await axios.post(route('public.events.guestbook.lookup-ticket', props.event.slug), {
+      code: code,
+    });
+
+    if (response.data.success && response.data.registration) {
+      const reg = response.data.registration;
+      playBeep(true);
+
+      // Auto-populate form
+      form.guest_name = reg.full_name;
+      form.company = reg.company || '';
+      form.registration_code = reg.registration_code;
+      verifiedAttendee.value = reg;
+
+      await closeScannerModal();
+
+      // Focus message field
+      nextTick(() => {
+        const msgInput = document.getElementById('guestbook-message-input');
+        if (msgInput) {
+          msgInput.focus();
+        }
+      });
+    }
+  } catch (err) {
+    playBeep(false);
+    scannerErrorMessage.value = err.response?.data?.message || `Ticket '${code}' not found for this event.`;
+  } finally {
+    isVerifyingTicket.value = false;
+  }
+};
+
+const clearScannedTicket = () => {
+  verifiedAttendee.value = null;
+  form.registration_code = '';
 };
 
 const submitForm = () => {
@@ -421,6 +674,7 @@ const submitForm = () => {
 const resetForNextGuest = () => {
   clearInterval(countdownTimer);
   form.reset();
+  verifiedAttendee.value = null;
   submittedSuccessfully.value = false;
 };
 
@@ -446,8 +700,11 @@ onMounted(() => {
   document.addEventListener('fullscreenchange', handleFullscreenChange);
 });
 
-onUnmounted(() => {
+onUnmounted(async () => {
   clearInterval(countdownTimer);
   document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  if (html5QrCode) {
+    try { await html5QrCode.stop(); } catch (e) {}
+  }
 });
 </script>
