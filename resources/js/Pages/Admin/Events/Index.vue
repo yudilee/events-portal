@@ -195,6 +195,17 @@
           </div>
 
           <form @submit.prevent="submitReschedule" class="space-y-3.5 pt-2">
+            <!-- Errors Alert Banner -->
+            <div
+              v-if="Object.keys(rescheduleForm.errors).length > 0"
+              class="p-3.5 rounded-2xl bg-rose-950/80 border border-rose-500/60 text-xs text-rose-200 space-y-1"
+            >
+              <div class="font-bold text-rose-300">Mohon periksa data berikut:</div>
+              <ul class="list-disc list-inside space-y-0.5 text-[0.72rem]">
+                <li v-for="(err, key) in rescheduleForm.errors" :key="key">{{ err }}</li>
+              </ul>
+            </div>
+
             <!-- TBA Checkbox Option -->
             <div class="p-3 rounded-2xl bg-amber-950/40 light:bg-amber-50 border border-amber-500/40">
               <label class="flex items-center gap-3 cursor-pointer">
@@ -222,9 +233,12 @@
                 <input
                   v-model="rescheduleForm.date"
                   type="date"
-                  required
+                  :required="!rescheduleForm.is_date_tba"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 light:bg-slate-100 border border-slate-700 light:border-slate-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-amber-400"
                 />
+                <span v-if="rescheduleForm.errors.date" class="text-[0.68rem] text-rose-400 mt-1 block">
+                  {{ rescheduleForm.errors.date }}
+                </span>
               </div>
               <div v-else class="p-3 rounded-xl bg-cyan-950/40 light:bg-cyan-50 border border-cyan-500/30 flex items-center justify-center text-center">
                 <span class="text-xs font-mono font-black text-cyan-300 light:text-cyan-800 uppercase tracking-wider">
@@ -265,6 +279,9 @@
                 required
                 class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 light:bg-slate-100 border border-slate-700 light:border-slate-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-amber-400"
               />
+              <span v-if="rescheduleForm.errors.venue_name" class="text-[0.68rem] text-rose-400 mt-1 block">
+                {{ rescheduleForm.errors.venue_name }}
+              </span>
             </div>
 
             <div>
@@ -278,6 +295,9 @@
                 placeholder="Tuliskan alasan penundaan atau jadwal baru yang akan ditampilkan kepada para tamu..."
                 class="w-full p-3 rounded-xl bg-slate-900 light:bg-slate-100 border border-amber-500/50 text-xs text-white light:text-slate-900 focus:outline-none focus:border-amber-400 leading-relaxed"
               ></textarea>
+              <span v-if="rescheduleForm.errors.reschedule_notice" class="text-[0.68rem] text-rose-400 mt-1 block">
+                {{ rescheduleForm.errors.reschedule_notice }}
+              </span>
             </div>
 
             <div class="p-3 rounded-xl bg-amber-950/40 light:bg-amber-50 border border-amber-800/40 text-[0.72rem] text-amber-300 light:text-amber-900 space-y-1">
@@ -425,6 +445,10 @@ const openRescheduleModal = (event) => {
 
 const submitReschedule = () => {
   if (!eventToReschedule.value) return;
+
+  if (rescheduleForm.is_date_tba && !rescheduleForm.date) {
+    rescheduleForm.date = eventToReschedule.value.date || '';
+  }
 
   rescheduleForm.post(route('admin.events.reschedule', eventToReschedule.value.id), {
     preserveScroll: true,

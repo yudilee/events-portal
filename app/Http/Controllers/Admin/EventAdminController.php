@@ -129,7 +129,7 @@ class EventAdminController extends Controller
             'content_html' => 'nullable|string',
             'event_type' => 'required|string',
             'visibility' => 'required|string',
-            'date' => 'required|date',
+            'date' => 'nullable',
             'start_time' => 'required|string',
             'end_time' => 'nullable|string',
             'timezone' => 'required|string',
@@ -140,17 +140,24 @@ class EventAdminController extends Controller
             'rsvp_contact' => 'nullable|string|max:100',
             'rsvp_phone' => 'nullable|string|max:50',
             'max_capacity' => 'required|integer|min:1',
-            'registration_deadline' => 'nullable|date',
+            'registration_deadline' => 'nullable',
             'status' => 'required|string|in:draft,published,rescheduled,ongoing,completed,archived',
             'reschedule_notice' => 'nullable|string',
-            'original_date' => 'nullable|date',
-            'is_date_tba' => 'boolean',
+            'original_date' => 'nullable',
+            'is_date_tba' => 'nullable',
             'is_registration_enabled' => 'boolean',
             'is_guestbook_enabled' => 'boolean',
             'is_gallery_enabled' => 'boolean',
             'is_post_event_enabled' => 'boolean',
             'agendas' => 'nullable|array',
         ]);
+
+        $isTba = filter_var($validated['is_date_tba'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $validated['is_date_tba'] = $isTba;
+
+        if (empty($validated['date']) || $isTba) {
+            $validated['date'] = $event->date;
+        }
 
         if ($validated['status'] === 'rescheduled' && empty($event->original_date)) {
             $validated['original_date'] = $event->date;
@@ -187,22 +194,25 @@ class EventAdminController extends Controller
         $event = Event::findOrFail($id);
 
         $validated = $request->validate([
-            'is_date_tba' => 'boolean',
-            'date' => 'nullable|date',
+            'is_date_tba' => 'nullable',
+            'date' => 'nullable',
             'start_time' => 'required|string',
             'end_time' => 'nullable|string',
             'venue_name' => 'required|string|max:255',
             'venue_address' => 'nullable|string',
             'venue_map_url' => 'nullable|string',
-            'registration_deadline' => 'nullable|date',
-            'reschedule_notice' => 'required|string|max:1000',
+            'registration_deadline' => 'nullable',
+            'reschedule_notice' => 'required|string',
         ]);
 
         if (empty($event->original_date)) {
             $validated['original_date'] = $event->date;
         }
 
-        if (empty($validated['date'])) {
+        $isTba = filter_var($validated['is_date_tba'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $validated['is_date_tba'] = $isTba;
+
+        if (empty($validated['date']) || $isTba) {
             $validated['date'] = $event->date;
         }
 
@@ -210,7 +220,7 @@ class EventAdminController extends Controller
 
         $event->update($validated);
 
-        $dateMsg = !empty($validated['is_date_tba']) ? 'To Be Announced Shortly (TBA)' : \Carbon\Carbon::parse($validated['date'])->format('d M Y');
+        $dateMsg = $isTba ? 'To Be Announced Shortly (TBA)' : \Carbon\Carbon::parse($validated['date'])->format('d M Y');
 
         return back()->with('success', "Event '{$event->title}' has been rescheduled. New schedule: {$dateMsg}.");
     }
