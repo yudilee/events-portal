@@ -53,13 +53,21 @@
                   </span>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="font-medium text-slate-200 light:text-slate-800 flex items-center gap-1.5">
+                  <div v-if="event.is_date_tba" class="space-y-0.5">
+                    <span class="inline-flex items-center gap-1 font-mono font-black text-xs text-cyan-400 light:text-cyan-800 bg-cyan-950/80 light:bg-cyan-100 px-2 py-0.5 rounded-md border border-cyan-700/50">
+                      ⏳ NEW DATE: TO BE ANNOUNCED SHORTLY
+                    </span>
+                    <div v-if="event.original_date" class="text-[0.68rem] text-rose-400 line-through">
+                      Semula: {{ formatDate(event.original_date) }}
+                    </div>
+                  </div>
+                  <div v-else class="font-medium text-slate-200 light:text-slate-800 flex items-center gap-1.5">
                     <span>📅 {{ formatDate(event.date) }}</span>
                     <span v-if="event.original_date && event.status === 'rescheduled'" class="text-[0.65rem] text-rose-400 line-through">
                       (was {{ formatDate(event.original_date) }})
                     </span>
                   </div>
-                  <div class="text-slate-400 light:text-slate-500 text-[0.7rem]">📍 {{ event.venue_name }}</div>
+                  <div class="text-slate-400 light:text-slate-500 text-[0.7rem] mt-0.5">📍 {{ event.venue_name }}</div>
                 </td>
                 <td class="px-6 py-4">
                   <div class="font-bold text-white light:text-slate-900">{{ event.attendees_count || 0 }} / {{ event.max_capacity }}</div>
@@ -187,8 +195,27 @@
           </div>
 
           <form @submit.prevent="submitReschedule" class="space-y-3.5 pt-2">
+            <!-- TBA Checkbox Option -->
+            <div class="p-3 rounded-2xl bg-amber-950/40 light:bg-amber-50 border border-amber-500/40">
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input
+                  v-model="rescheduleForm.is_date_tba"
+                  type="checkbox"
+                  class="w-4 h-4 text-amber-500 rounded bg-slate-900 border-amber-600 focus:ring-amber-500"
+                />
+                <div>
+                  <span class="text-xs font-bold text-amber-300 light:text-amber-900 block">
+                    Tanggal Baru Belum Ditentukan (To Be Announced Shortly / TBA)
+                  </span>
+                  <span class="text-[0.68rem] text-slate-400 light:text-slate-600 block">
+                    Pilih opsi ini jika tanggal pengganti belum fix dan akan diumumkan kemudian.
+                  </span>
+                </div>
+              </label>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
+              <div v-if="!rescheduleForm.is_date_tba">
                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 light:text-slate-700 mb-1">
                   New Event Date <span class="text-rose-400">*</span>
                 </label>
@@ -198,6 +225,11 @@
                   required
                   class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 light:bg-slate-100 border border-slate-700 light:border-slate-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-amber-400"
                 />
+              </div>
+              <div v-else class="p-3 rounded-xl bg-cyan-950/40 light:bg-cyan-50 border border-cyan-500/30 flex items-center justify-center text-center">
+                <span class="text-xs font-mono font-black text-cyan-300 light:text-cyan-800 uppercase tracking-wider">
+                  ⏳ NEW DATE: TO BE ANNOUNCED SHORTLY
+                </span>
               </div>
 
               <div>
@@ -367,6 +399,7 @@ const eventToReschedule = ref(null);
 const isDeleting = ref(false);
 
 const rescheduleForm = useForm({
+  is_date_tba: true,
   date: '',
   start_time: '10:00',
   end_time: '13:00',
@@ -379,6 +412,7 @@ const rescheduleForm = useForm({
 
 const openRescheduleModal = (event) => {
   eventToReschedule.value = event;
+  rescheduleForm.is_date_tba = event.is_date_tba ?? true;
   rescheduleForm.date = event.date || '';
   rescheduleForm.start_time = event.start_time || '10:00';
   rescheduleForm.end_time = event.end_time || '13:00';
@@ -386,7 +420,7 @@ const openRescheduleModal = (event) => {
   rescheduleForm.venue_address = event.venue_address || '';
   rescheduleForm.venue_map_url = event.venue_map_url || '';
   rescheduleForm.registration_deadline = event.registration_deadline || null;
-  rescheduleForm.reschedule_notice = event.reschedule_notice || `Sehubungan dengan penyesuaian jadwal dan operasional, acara ${event.title} dijadwalkan ulang. Seluruh e-tiket dan kode registrasi yang telah diterbitkan tetap berlaku.`;
+  rescheduleForm.reschedule_notice = event.reschedule_notice || `Kami memohon maaf yang sebesar-besarnya atas ketidaknyamanan yang terjadi. Keamanan, kenyamanan, dan kepuasan Anda tetap menjadi prioritas utama kami. Jadwal tanggal baru acara akan kami umumkan segera (To Be Announced Shortly). Seluruh e-tiket yang telah didapatkan tetap berlaku.`;
 };
 
 const submitReschedule = () => {

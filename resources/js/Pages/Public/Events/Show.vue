@@ -12,45 +12,113 @@
           <span class="text-slate-200 light:text-slate-900 line-clamp-1 font-semibold">{{ event.title }}</span>
         </div>
 
-        <!-- Event Reschedule Urgent Announcement Banner -->
+        <!-- Event Reschedule Urgent Announcement Banner (Matching Official Flyer) -->
         <div
           v-if="event.status === 'rescheduled' || event.reschedule_notice"
-          class="mb-8 p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-amber-950/90 via-slate-950 to-amber-950/80 light:from-amber-50 light:to-amber-100 border-2 border-amber-500/70 light:border-amber-400 shadow-2xl shadow-amber-950/40 relative overflow-hidden"
+          class="mb-10 p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 light:from-amber-50/80 light:via-white light:to-amber-50/80 border-2 border-cyan-500/50 light:border-amber-400 shadow-2xl shadow-cyan-950/40 relative overflow-hidden"
         >
-          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
-            <div class="flex items-start gap-4">
-              <div class="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black shrink-0 shadow-md">
-                <CalendarClock class="w-6 h-6" />
-              </div>
-              <div class="space-y-1.5">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="px-2.5 py-0.5 rounded-full text-[0.68rem] font-black uppercase tracking-widest bg-amber-500 text-slate-950">
-                    PEMBERITAHUAN RESCHEDULE
-                  </span>
-                  <span v-if="event.original_date" class="text-xs text-amber-300 light:text-amber-800 font-medium">
-                    (Jadwal Semula: <span class="line-through">{{ formatDate(event.original_date) }}</span>)
-                  </span>
+          <!-- Top Accent Light Line -->
+          <div class="absolute top-0 left-1/4 right-1/4 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+
+          <div class="space-y-6">
+            <!-- Header Badge -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 light:border-amber-200/80 pb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-500 text-slate-950 flex items-center justify-center font-black shrink-0 shadow-lg shadow-cyan-500/30">
+                  <CalendarClock class="w-5 h-5" />
                 </div>
-                <h3 class="text-base sm:text-lg font-black text-amber-200 light:text-amber-900 font-heading">
-                  Acara Ini Telah Dijadwalkan Ulang Menjadi: {{ formatDate(event.date) }} ({{ event.start_time }} {{ event.timezone }})
-                </h3>
-                <p class="text-xs sm:text-sm text-amber-100/90 light:text-amber-900 leading-relaxed max-w-3xl">
-                  {{ event.reschedule_notice }}
-                </p>
-                <div class="pt-1 text-[0.72rem] text-amber-300 light:text-amber-800 font-semibold flex items-center gap-1.5">
-                  <span>✓</span>
-                  <span>Seluruh E-Tiket & Kode QR Registrasi yang telah diterbitkan tetap berlaku untuk jadwal baru.</span>
+                <div>
+                  <span class="text-[0.65rem] font-bold uppercase tracking-widest text-cyan-400 light:text-cyan-700 block">
+                    EVENT UPDATE
+                  </span>
+                  <h3 class="text-lg sm:text-xl font-black text-white light:text-slate-900 font-heading tracking-wider uppercase">
+                    EVENT RESCHEDULE
+                  </h3>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <span class="px-3 py-1 rounded-full text-[0.68rem] font-black uppercase tracking-wider bg-rose-500/20 text-rose-300 light:text-rose-700 border border-rose-500/40">
+                  ⚠️ PEMBERITAHUAN RESMI
+                </span>
+              </div>
+            </div>
+
+            <!-- Date Comparison Cards (Like Flyer) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Original Date Box -->
+              <div class="p-4 sm:p-5 rounded-2xl bg-slate-900/90 light:bg-slate-100/80 border border-slate-800 light:border-slate-300 text-center space-y-1 relative">
+                <span class="text-[0.65rem] font-extrabold uppercase tracking-widest text-rose-400 light:text-rose-600 block">
+                  ORIGINAL DATE
+                </span>
+                <div class="text-base sm:text-lg font-black text-slate-400 light:text-slate-500 line-through decoration-rose-500 decoration-2 font-heading">
+                  {{ formatDate(event.original_date || event.date) }}
+                </div>
+                <div class="text-[0.7rem] text-rose-400/80 light:text-rose-600">
+                  (DIBATALKAN / DIUNDUR)
+                </div>
+              </div>
+
+              <!-- New Date Box -->
+              <div
+                v-if="event.is_date_tba"
+                class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-cyan-950/60 via-slate-900 to-cyan-950/60 light:from-cyan-50 light:to-teal-50 border-2 border-cyan-400/80 light:border-cyan-500 text-center space-y-1 shadow-lg shadow-cyan-950/50 relative"
+              >
+                <span class="text-[0.65rem] font-extrabold uppercase tracking-widest text-cyan-400 light:text-cyan-700 block">
+                  NEW DATE
+                </span>
+                <div class="text-base sm:text-xl font-black text-white light:text-cyan-950 font-heading tracking-wider animate-pulse">
+                  TO BE ANNOUNCED SHORTLY
+                </div>
+                <div class="text-[0.7rem] text-cyan-300 light:text-cyan-700 font-medium">
+                  (Akan Diumumkan Segera)
+                </div>
+              </div>
+
+              <div
+                v-else
+                class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-teal-950/60 via-slate-900 to-teal-950/60 light:from-teal-50 light:to-teal-100 border-2 border-teal-400/80 light:border-teal-500 text-center space-y-1 shadow-lg shadow-teal-950/50 relative"
+              >
+                <span class="text-[0.65rem] font-extrabold uppercase tracking-widest text-teal-400 light:text-teal-700 block">
+                  NEW DATE
+                </span>
+                <div class="text-base sm:text-xl font-black text-white light:text-slate-900 font-heading">
+                  {{ formatDate(event.date) }}
+                </div>
+                <div class="text-[0.7rem] text-teal-300 light:text-teal-800 font-medium">
+                  {{ event.start_time }} - {{ event.end_time || 'Finish' }} {{ event.timezone }}
                 </div>
               </div>
             </div>
 
-            <Link
-              v-if="event.is_registration_enabled && !event.is_full"
-              :href="route('public.events.register', event.slug)"
-              class="px-5 py-3 rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 transition-all shrink-0 shadow-lg shadow-amber-950/60 self-start md:self-auto"
-            >
-              RSVP Jadwal Baru &rarr;
-            </Link>
+            <!-- Official Statement & Apology Text -->
+            <div class="space-y-2 text-center max-w-3xl mx-auto pt-1">
+              <p v-if="event.reschedule_notice" class="text-xs sm:text-sm text-slate-200 light:text-slate-800 leading-relaxed font-medium">
+                "{{ event.reschedule_notice }}"
+              </p>
+              <p class="text-[0.72rem] sm:text-xs text-slate-400 light:text-slate-600 italic leading-relaxed">
+                We sincerely apologize for any inconvenience this change may cause. Your safety, comfort, and convenience remain our top priority.
+              </p>
+              <div class="text-[0.68rem] sm:text-xs font-black uppercase tracking-wider text-teal-400 light:text-teal-700 pt-1">
+                THANK YOU FOR YOUR KIND UNDERSTANDING.
+              </div>
+            </div>
+
+            <!-- Ticket Guarantee Footer -->
+            <div class="pt-3 border-t border-slate-800/80 light:border-amber-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div class="flex items-center gap-2 text-teal-300 light:text-teal-800 font-semibold">
+                <span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span>
+                <span>Seluruh E-Tiket & Kode QR yang telah didapatkan tetap SAH dan otomatis berlaku.</span>
+              </div>
+
+              <Link
+                v-if="event.is_registration_enabled && !event.is_full"
+                :href="route('public.events.register', event.slug)"
+                class="px-5 py-2.5 rounded-xl text-xs font-black bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition-all shadow-md shrink-0"
+              >
+                RSVP Pre-Register Standby &rarr;
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -129,7 +197,18 @@
           <!-- Right Column: Live Countdown & RSVP Card -->
           <div class="lg:col-span-4">
             <div class="glass-card rounded-3xl p-6 sm:p-7 border border-teal-500/30 space-y-6 shadow-2xl relative">
-              <div class="text-center">
+              <div v-if="event.is_date_tba" class="p-5 rounded-2xl bg-slate-900/80 light:bg-slate-100 border border-cyan-500/40 text-center space-y-2 shadow-inner">
+                <span class="text-[0.65rem] font-bold uppercase tracking-widest text-cyan-400 light:text-cyan-700 block">
+                  Schedule Status
+                </span>
+                <div class="text-sm sm:text-base font-black font-heading text-white light:text-slate-900 tracking-wide">
+                  TO BE ANNOUNCED SHORTLY
+                </div>
+                <p class="text-[0.7rem] text-slate-400 light:text-slate-600 leading-relaxed">
+                  Jadwal baru sedang diselaraskan. Pantau portal acara ini untuk pengumuman tanggal terbaru.
+                </p>
+              </div>
+              <div v-else class="text-center">
                 <span class="text-xs font-bold uppercase tracking-widest text-slate-400 light:text-slate-500 block mb-3">
                   Event Countdown
                 </span>

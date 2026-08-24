@@ -70,6 +70,7 @@ class EventAdminController extends Controller
             'status' => 'required|string|in:draft,published,rescheduled,ongoing,completed,archived',
             'reschedule_notice' => 'nullable|string',
             'original_date' => 'nullable|date',
+            'is_date_tba' => 'boolean',
             'is_registration_enabled' => 'boolean',
             'is_guestbook_enabled' => 'boolean',
             'is_gallery_enabled' => 'boolean',
@@ -143,6 +144,7 @@ class EventAdminController extends Controller
             'status' => 'required|string|in:draft,published,rescheduled,ongoing,completed,archived',
             'reschedule_notice' => 'nullable|string',
             'original_date' => 'nullable|date',
+            'is_date_tba' => 'boolean',
             'is_registration_enabled' => 'boolean',
             'is_guestbook_enabled' => 'boolean',
             'is_gallery_enabled' => 'boolean',
@@ -185,7 +187,8 @@ class EventAdminController extends Controller
         $event = Event::findOrFail($id);
 
         $validated = $request->validate([
-            'date' => 'required|date',
+            'is_date_tba' => 'boolean',
+            'date' => 'nullable|date',
             'start_time' => 'required|string',
             'end_time' => 'nullable|string',
             'venue_name' => 'required|string|max:255',
@@ -199,11 +202,17 @@ class EventAdminController extends Controller
             $validated['original_date'] = $event->date;
         }
 
+        if (empty($validated['date'])) {
+            $validated['date'] = $event->date;
+        }
+
         $validated['status'] = 'rescheduled';
 
         $event->update($validated);
 
-        return back()->with('success', "Event '{$event->title}' has been successfully rescheduled to " . \Carbon\Carbon::parse($validated['date'])->format('d M Y') . ".");
+        $dateMsg = !empty($validated['is_date_tba']) ? 'To Be Announced Shortly (TBA)' : \Carbon\Carbon::parse($validated['date'])->format('d M Y');
+
+        return back()->with('success', "Event '{$event->title}' has been rescheduled. New schedule: {$dateMsg}.");
     }
 
     public function destroy(int $id): RedirectResponse

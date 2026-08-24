@@ -240,10 +240,29 @@
               </div>
             </div>
 
+            <!-- TBA Checkbox Option -->
+            <div class="p-3 rounded-xl bg-slate-900/80 light:bg-white border border-amber-500/40">
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input
+                  v-model="form.is_date_tba"
+                  type="checkbox"
+                  class="w-4 h-4 text-amber-500 rounded bg-slate-900 border-amber-600 focus:ring-amber-500"
+                />
+                <div>
+                  <span class="text-xs font-bold text-amber-300 light:text-amber-900 block">
+                    Tanggal Baru Belum Ditentukan (To Be Announced Shortly / TBA)
+                  </span>
+                  <span class="text-[0.7rem] text-slate-400 light:text-slate-600 block">
+                    Centang ini jika tanggal pengganti masih dalam koordinasi internal dan akan diumumkan kemudian.
+                  </span>
+                </div>
+              </label>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
               <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-amber-300 light:text-amber-900 mb-1">
-                  Original Event Date (Before Reschedule)
+                  Original Event Date (Jadwal Semula)
                 </label>
                 <input
                   v-model="form.original_date"
@@ -252,15 +271,20 @@
                 />
               </div>
 
-              <div>
+              <div v-if="!form.is_date_tba">
                 <label class="block text-xs font-bold uppercase tracking-wider text-amber-300 light:text-amber-900 mb-1">
-                  New Event Date
+                  New Event Date (Jadwal Baru)
                 </label>
                 <input
                   v-model="form.date"
                   type="date"
                   class="w-full px-4 py-2.5 rounded-xl bg-slate-900 light:bg-white border border-amber-700/60 light:border-amber-300 text-xs text-white light:text-slate-900 focus:outline-none focus:border-amber-400"
                 />
+              </div>
+              <div v-else class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-center">
+                <span class="text-xs font-mono font-black text-amber-300 light:text-amber-800 uppercase tracking-wider">
+                  ⏳ NEW DATE: TO BE ANNOUNCED SHORTLY
+                </span>
               </div>
             </div>
 
@@ -515,6 +539,7 @@ const form = useForm({
   status: props.event?.status || 'published',
   reschedule_notice: props.event?.reschedule_notice || '',
   original_date: props.event?.original_date || '',
+  is_date_tba: props.event?.is_date_tba ?? false,
   is_registration_enabled: props.event?.is_registration_enabled ?? true,
   is_guestbook_enabled: props.event?.is_guestbook_enabled ?? true,
   is_gallery_enabled: props.event?.is_gallery_enabled ?? true,

@@ -9,9 +9,9 @@
         <div class="flex items-center gap-2">
           <span
             v-if="event.status === 'rescheduled'"
-            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.65rem] font-black uppercase tracking-wider bg-amber-950/90 light:bg-amber-100 text-amber-300 light:text-amber-800 border border-amber-500/50 shadow-sm"
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.65rem] font-black uppercase tracking-wider bg-cyan-950/90 light:bg-cyan-100 text-cyan-300 light:text-cyan-800 border border-cyan-500/50 shadow-sm"
           >
-            ⚠️ Rescheduled
+            {{ event.is_date_tba ? '⚠️ Rescheduled (TBA)' : '⚠️ Rescheduled' }}
           </span>
 
           <span
@@ -46,7 +46,16 @@
 
       <!-- Event Details Grid -->
       <div class="space-y-2.5 text-xs text-slate-300 light:text-slate-700 border-t border-slate-800/60 light:border-slate-200 pt-4">
-        <div class="flex items-center gap-2.5">
+        <!-- Date & Time Row (TBA Aware) -->
+        <div v-if="event.is_date_tba" class="space-y-1">
+          <div class="flex items-center gap-2 font-mono font-black text-cyan-400 light:text-cyan-700">
+            <span>⏳ NEW DATE: TO BE ANNOUNCED SHORTLY</span>
+          </div>
+          <div v-if="event.original_date" class="text-[0.68rem] text-rose-400/80 line-through">
+            Original Date: {{ formatDate(event.original_date) }}
+          </div>
+        </div>
+        <div v-else class="flex items-center gap-2.5">
           <Calendar class="w-4 h-4 text-teal-400 light:text-teal-700 shrink-0" />
           <span class="font-semibold text-slate-200 light:text-slate-900">{{ formattedDate }}</span>
           <span class="text-slate-500 light:text-slate-400">•</span>

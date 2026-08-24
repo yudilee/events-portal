@@ -358,13 +358,19 @@ const copied = ref(false);
 const whatsappTemplateText = computed(() => {
   if (!props.selectedEvent) return '';
   const ev = props.selectedEvent;
-  const reason = ev.reschedule_notice || 'Sehubungan dengan penyesuaian operasional dan jadwal manajemen.';
-  const newDate = formatDate(ev.date);
-  const time = `${ev.start_time || '10:00'} ${ev.timezone || 'WIB'}`;
+  const reason = ev.reschedule_notice || 'Kami memohon maaf yang sebesar-besarnya atas ketidaknyamanan yang terjadi. Keamanan, kenyamanan, dan kepuasan Anda tetap menjadi prioritas utama kami.';
   const venue = ev.venue_name || 'Showroom PT Hartono Raya Motor';
   const url = `https://events.hartonomotor-group.com/events/${ev.slug}`;
 
-  return `*PEMBERITAHUAN PENJADWALAN ULANG ACARA (RESCHEDULE)*\nKepada Yth. Tamu Undangan ${ev.title},\n\nKami dari panitia Hartono Raya Motor / Hartono Group menginformasikan bahwa sehubungan dengan:\n"${reason}"\n\nAcara resmi dijadwalkan ulang menjadi:\n📅 Tanggal Baru: ${newDate}\n⏰ Waktu: ${time}\n📍 Lokasi: ${venue}\n\n*PENTING:* E-Tiket & Kode QR registrasi yang telah Anda terima tetap SAH dan dapat langsung digunakan untuk check-in pada hari acara.\n\nDetail Acara & E-Tiket:\n${url}\n\nTerima kasih atas pengertian dan kerja sama Anda.\nSalam hangat,\n*Panitia Hartono Group Events*`;
+  if (ev.is_date_tba) {
+    const originalDate = ev.original_date ? formatDate(ev.original_date) : formatDate(ev.date);
+    return `*EVENT UPDATE: EVENT RESCHEDULE*\nKepada Yth. Tamu Undangan ${ev.title},\n\nKami dari panitia PT Hartono Raya Motor / HR Auto Studio menginformasikan pembaruan status jadwal acara:\n\n❌ *Jadwal Semula:* ${originalDate}\n⏳ *JADWAL BARU: TO BE ANNOUNCED SHORTLY (Akan Segera Diumumkan)*\n📍 *Lokasi:* ${venue}\n\n*Pemberitahuan Resmi:*\n"${reason}"\n\n*PENTING BAGI PEMEGANG TIKET:* Seluruh E-Tiket & Kode QR registrasi yang telah Anda terima tetap *SAH & RESMI*, dan otomatis berlaku untuk jadwal baru begitu diumumkan.\n\nPantau Update & E-Tiket Anda di:\n${url}\n\n_We sincerely apologize for any inconvenience this change may cause. Your safety, comfort, and convenience remain our top priority._\n\nTerima kasih atas pengertian dan kerja sama Anda.\n\nSalam hangat,\n*Panitia PT Hartono Raya Motor & HR Auto Studio*`;
+  }
+
+  const newDate = formatDate(ev.date);
+  const time = `${ev.start_time || '10:00'} ${ev.timezone || 'WIB'}`;
+
+  return `*EVENT UPDATE: EVENT RESCHEDULE*\nKepada Yth. Tamu Undangan ${ev.title},\n\nKami dari panitia PT Hartono Raya Motor / HR Auto Studio menginformasikan bahwa acara resmi dijadwalkan ulang:\n\n📅 *Tanggal Baru:* ${newDate}\n⏰ *Waktu:* ${time}\n📍 *Lokasi:* ${venue}\n\n*Pemberitahuan:*\n"${reason}"\n\n*PENTING:* Seluruh E-Tiket & Kode QR registrasi yang telah diterbitkan tetap *SAH* dan dapat langsung digunakan untuk check-in.\n\nDetail Acara & E-Tiket:\n${url}\n\nTerima kasih atas pengertian dan kerja sama Anda.\n\nSalam hangat,\n*Panitia PT Hartono Raya Motor & HR Auto Studio*`;
 });
 
 const copyWhatsAppTemplate = async () => {

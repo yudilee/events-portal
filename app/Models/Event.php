@@ -38,6 +38,7 @@ class Event extends Model
         'status',
         'reschedule_notice',
         'original_date',
+        'is_date_tba',
         'is_registration_enabled',
         'is_guestbook_enabled',
         'is_gallery_enabled',
@@ -49,6 +50,7 @@ class Event extends Model
     protected $casts = [
         'date' => 'date:Y-m-d',
         'original_date' => 'date:Y-m-d',
+        'is_date_tba' => 'boolean',
         'registration_deadline' => 'datetime:Y-m-d H:i',
         'post_event_published_at' => 'datetime:Y-m-d H:i',
         'is_registration_enabled' => 'boolean',

@@ -99,12 +99,15 @@
           <!-- Rescheduled Pass Notice Banner (If event was rescheduled) -->
           <div
             v-if="event.status === 'rescheduled' || event.reschedule_notice"
-            class="p-3.5 rounded-2xl bg-amber-950/80 light:bg-amber-50 border border-amber-500/60 print:border-black text-amber-200 print:text-black text-xs space-y-1"
+            class="p-3.5 rounded-2xl bg-slate-900/90 light:bg-amber-50 border-2 border-cyan-500/60 light:border-amber-400 print:border-black text-slate-200 print:text-black text-xs space-y-1.5"
           >
-            <div class="font-bold flex items-center gap-1.5 text-amber-400 print:text-black uppercase text-[0.68rem] tracking-wider">
-              <span>⚠️ PEMBERITAHUAN: JADWAL ACARA DIUNDUR / RESCHEDULED</span>
+            <div class="font-black flex items-center gap-1.5 text-cyan-400 light:text-amber-900 print:text-black uppercase text-[0.68rem] tracking-wider">
+              <span>⚠️ PEMBERITAHUAN RESMI: EVENT RESCHEDULE</span>
             </div>
-            <p class="text-[0.7rem] text-amber-100/90 print:text-black leading-relaxed">
+            <p v-if="event.is_date_tba" class="text-[0.7rem] text-slate-300 light:text-slate-800 print:text-black leading-relaxed">
+              Jadwal acara telah diundur menjadi: <strong class="text-cyan-300 light:text-black">TO BE ANNOUNCED SHORTLY</strong>. E-Tiket & kode QR ini tetap <strong>SAH & RESMI</strong> dan akan otomatis berlaku untuk tanggal baru.
+            </p>
+            <p v-else class="text-[0.7rem] text-slate-300 light:text-slate-800 print:text-black leading-relaxed">
               Acara resmi dijadwalkan ulang menjadi <strong>{{ formatDate(event.date) }}</strong> pukul <strong>{{ event.start_time }} {{ event.timezone }}</strong>. Tiket & barcode QR di bawah ini tetap sah digunakan untuk check-in.
             </p>
           </div>
@@ -119,12 +122,22 @@
 
             <div class="col-span-2 sm:col-span-1">
               <span class="text-slate-400 print:text-slate-600 uppercase text-[0.65rem] tracking-wider block font-semibold">Date & Schedule</span>
-              <span class="text-xs sm:text-sm font-bold text-white print:text-black block mt-0.5">
-                📅 {{ formatDate(event.date) }}
-              </span>
-              <span class="text-teal-400 print:text-slate-700 text-[0.7rem] font-mono block mt-0.5">
-                ⏰ {{ event.start_time || '10:00' }} - {{ event.end_time || 'Finish' }} {{ event.timezone || 'WIB' }}
-              </span>
+              <div v-if="event.is_date_tba">
+                <span class="text-xs font-black text-cyan-300 light:text-cyan-900 print:text-black block mt-0.5 font-mono">
+                  ⏳ TO BE ANNOUNCED SHORTLY
+                </span>
+                <span v-if="event.original_date" class="text-slate-500 print:text-slate-600 text-[0.68rem] line-through block mt-0.5">
+                  Semula: {{ formatDate(event.original_date) }}
+                </span>
+              </div>
+              <div v-else>
+                <span class="text-xs sm:text-sm font-bold text-white print:text-black block mt-0.5">
+                  📅 {{ formatDate(event.date) }}
+                </span>
+                <span class="text-teal-400 print:text-slate-700 text-[0.7rem] font-mono block mt-0.5">
+                  ⏰ {{ event.start_time || '10:00' }} - {{ event.end_time || 'Finish' }} {{ event.timezone || 'WIB' }}
+                </span>
+              </div>
             </div>
 
             <div>
