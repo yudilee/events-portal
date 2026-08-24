@@ -1,0 +1,177 @@
+@import 'tailwindcss';
+
+@custom-variant light (&:where(.light, .light *));
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source '../views/**/*.blade.php';
+@source '../js/**/*.vue';
+@source '../js/**/*.js';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+:root {
+    /* Base Dark Theme (Midnight Luxury) */
+    --bg-primary: #070B0E;
+    --bg-surface: #0E1620;
+    --bg-card: rgba(14, 22, 32, 0.85);
+    --bg-card-hover: rgba(22, 36, 52, 0.95);
+    --bg-input: #0B131D;
+    --border-card: rgba(255, 255, 255, 0.08);
+    --border-subtle: #1E2D40;
+    --text-main: #FFFFFF;
+    --text-sub: #CBD5E1;
+    --text-dim: #94A3B8;
+    --accent-teal: #00B4B4;
+    --accent-teal-dark: #0E8B8B;
+    --accent-teal-soft: rgba(0, 180, 180, 0.15);
+    --accent-teal-glow: rgba(0, 180, 180, 0.25);
+    --nav-bg: rgba(7, 11, 14, 0.92);
+    --nav-border: rgba(255, 255, 255, 0.08);
+}
+
+html.light {
+    /* Light Theme (Clean Crisp Platinum Luxury - Hartono Group Brand Guidelines) */
+    color-scheme: light;
+    --bg-primary: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F1F5F9;
+    --bg-input: #FFFFFF;
+    --border-card: #E2E8F0;
+    --border-subtle: #CBD5E1;
+    --text-main: #0B131D;
+    --text-sub: #334155;
+    --text-dim: #64748B;
+    --accent-teal: #00828A;
+    --accent-teal-dark: #00606F;
+    --accent-teal-soft: #E6F6F7;
+    --accent-teal-glow: rgba(0, 130, 138, 0.18);
+    --nav-bg: rgba(255, 255, 255, 0.98);
+    --nav-border: #E2E8F0;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@theme {
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-heading: 'Montserrat', system-ui, -apple-system, sans-serif;
+
+    /* Hartono Group & Mercedes-Benz Luxury Palette */
+    --color-hartono-dark: var(--bg-primary);
+    --color-hartono-surface: var(--bg-surface);
+    --color-hartono-card: var(--bg-card);
+    --color-hartono-border: var(--border-subtle);
+    --color-hartono-teal: var(--accent-teal);
+    --color-hartono-teal-light: #00B4B4;
+    --color-hartono-teal-glow: var(--accent-teal-glow);
+    --color-hartono-cyan: #06B6D4;
+    --color-hartono-accent: #E53935;
+    --color-hartono-gold: #D4AF37;
+}
+
+/* Custom Utilities for Luxury Automotive Theme */
+@layer utilities {
+    .glass-card {
+        background-color: var(--bg-card);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--border-card);
+    }
+    
+    .glass-card-hover {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card-hover:hover {
+        background-color: var(--bg-card-hover);
+        border-color: var(--accent-teal);
+        box-shadow: 0 10px 30px -10px var(--accent-teal-glow);
+        transform: translateY(-2px);
+    }
+
+    .glass-nav {
+        background-color: var(--nav-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--nav-border);
+    }
+
+    .glow-teal {
+        box-shadow: 0 0 25px var(--accent-teal-glow);
+    }
+
+    .text-gradient-teal {
+        background: linear-gradient(135deg, var(--text-main) 20%, var(--accent-teal) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .text-gradient-gold {
+        background: linear-gradient(135deg, #FDE68A 0%, #D4AF37 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .bg-mesh-dark {
+        background-color: var(--bg-primary);
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(14, 139, 139, 0.12) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.08) 0px, transparent 50%),
+            radial-gradient(at 50% 50%, rgba(14, 22, 32, 0.5) 0px, transparent 100%);
+    }
+
+    html.light .bg-mesh-dark {
+        background-color: #F8FAFC;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(0, 130, 138, 0.03) 0px, transparent 40%),
+            radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.02) 0px, transparent 40%);
+    }
+
+    .bg-wave-gradient {
+        background: linear-gradient(135deg, rgba(14, 139, 139, 0.9) 0%, rgba(0, 180, 180, 0.8) 50%, var(--bg-primary) 100%);
+    }
+}
+
+/* Tiptap Rich Editor Prose Styles */
+.prose-hartono {
+    color: var(--text-sub);
+}
+.prose-hartono h1,
+.prose-hartono h2,
+.prose-hartono h3,
+.prose-hartono h4 {
+    color: var(--text-main);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+}
+.prose-hartono h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.35rem; }
+.prose-hartono h3 { font-size: 1.25rem; }
+.prose-hartono p { margin-bottom: 0.85em; line-height: 1.7; }
+.prose-hartono a { color: var(--accent-teal); text-decoration: underline; }
+.prose-hartono strong { color: var(--text-main); font-weight: 700; }
+.prose-hartono ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.85em; }
+.prose-hartono ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.85em; }
+.prose-hartono li { margin-bottom: 0.35em; }
+.prose-hartono blockquote {
+    border-left: 3px solid var(--accent-teal);
+    padding-left: 1rem;
+    font-style: italic;
+    color: var(--text-dim);
+    margin: 1em 0;
+}
+.prose-hartono img {
+    border-radius: 1rem;
+    margin: 1.5em 0;
+    border: 1px solid var(--border-subtle);
+    max-width: 100%;
+}
+.prose-hartono hr {
+    border-color: var(--border-subtle);
+    margin: 2em 0;
+}

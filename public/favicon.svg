@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A161E"/>
+      <stop offset="100%" stop-color="#03070A"/>
+    </linearGradient>
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2DD4BF"/>
+      <stop offset="50%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#14B8A6"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <!-- Rounded Base Badge -->
+  <rect width="128" height="128" rx="28" fill="url(#bgGrad)" stroke="#14B8A6" stroke-width="2" stroke-opacity="0.4"/>
+  
+  <!-- Outer Ring of Star -->
+  <circle cx="64" cy="64" r="44" fill="none" stroke="url(#starGrad)" stroke-width="4.5"/>
+  
+  <!-- 3-Point Star Facets -->
+  <!-- Top Point -->
+  <polygon points="64,23 64,64 56,64" fill="#5EEAD4" opacity="0.95"/>
+  <polygon points="64,23 64,64 72,64" fill="#FFFFFF" opacity="0.85"/>
+  
+  <!-- Bottom Left Point -->
+  <polygon points="28.5,84.5 64,64 60,57" fill="#14B8A6" opacity="0.95"/>
+  <polygon points="28.5,84.5 64,64 68,71" fill="#FFFFFF" opacity="0.85"/>
+  
+  <!-- Bottom Right Point -->
+  <polygon points="99.5,84.5 64,64 68,57" fill="#2DD4BF" opacity="0.95"/>
+  <polygon points="99.5,84.5 64,64 60,71" fill="#0D9488" opacity="0.85"/>
+  
+  <!-- Center Star Hub Pin -->
+  <circle cx="64" cy="64" r="3" fill="#FFFFFF"/>
+</svg>
