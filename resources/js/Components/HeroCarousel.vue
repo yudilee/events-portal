@@ -63,11 +63,11 @@
           <!-- CTA Buttons -->
           <div class="pt-2 flex flex-wrap items-center gap-3">
             <Link
-              v-if="activeSlide.cta_url"
-              :href="activeSlide.cta_url"
+              v-if="slideCtaUrl"
+              :href="slideCtaUrl"
               class="px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm bg-gradient-to-r from-teal-500 via-teal-400 to-cyan-400 text-slate-950 shadow-xl shadow-teal-950/60 hover:shadow-teal-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2"
             >
-              <span>{{ activeSlide.event?.is_date_tba ? 'Lihat Pengumuman Reschedule' : (activeSlide.cta_text || 'Explore Event') }}</span>
+              <span>{{ (activeSlide.event?.is_date_tba || activeSlide.event?.status === 'rescheduled') ? 'Lihat Pengumuman Reschedule' : (activeSlide.cta_text || 'Explore Event') }}</span>
               <ArrowRight class="w-4 h-4" />
             </Link>
 
@@ -227,6 +227,14 @@ let timer = null;
 
 const activeSlide = computed(() => {
   return currentSlides.value[currentSlideIndex.value] || currentSlides.value[0];
+});
+
+const slideCtaUrl = computed(() => {
+  if (!activeSlide.value) return '/events';
+  if (activeSlide.value.event?.is_date_tba || activeSlide.value.event?.status === 'rescheduled') {
+    return `/events/${activeSlide.value.event.slug}`;
+  }
+  return activeSlide.value.cta_url || (activeSlide.value.event ? `/events/${activeSlide.value.event.slug}` : '/events');
 });
 
 const nextSlide = () => {

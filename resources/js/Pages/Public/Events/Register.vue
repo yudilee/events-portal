@@ -26,11 +26,37 @@
           </p>
         </div>
 
+        <!-- Rescheduled Announcement Notice on Register Page -->
+        <div
+          v-if="event.status === 'rescheduled' || event.is_date_tba"
+          class="mb-6 p-4 rounded-2xl bg-cyan-950/80 border border-cyan-400/50 shadow-lg text-xs space-y-1.5"
+        >
+          <div class="flex items-center gap-2 font-bold text-cyan-300">
+            <span class="px-2 py-0.5 rounded-full bg-cyan-400 text-slate-950 text-[0.65rem] font-black uppercase">
+              Rescheduled Event
+            </span>
+            <span>Jadwal Acara Sedang Disesuaikan (To Be Announced)</span>
+          </div>
+          <p class="text-slate-300 text-[0.72rem] leading-relaxed">
+            Acara ini sedang dalam penjadwalan ulang. Pendaftaran tetap dibuka dan E-Tiket yang Anda peroleh akan <strong>otomatis berlaku penuh</strong> untuk tanggal baru saat diumumkan.
+          </p>
+        </div>
+
         <!-- Event Snapshot Pill -->
         <div class="glass-card bg-slate-950/60 light:bg-slate-50 rounded-2xl p-4 mb-8 border border-slate-800 light:border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-300 light:text-slate-700">
           <div>
             <div class="font-bold text-white light:text-slate-900 text-sm">{{ event.title }}</div>
-            <div class="text-slate-400 light:text-slate-500 mt-0.5">📅 {{ formatDate(event.date) }} • ⏰ {{ event.start_time }} {{ event.timezone }} • 👔 {{ event.dress_code }}</div>
+            <div v-if="event.is_date_tba" class="text-cyan-300 light:text-cyan-800 font-mono font-bold mt-0.5 flex items-center gap-1.5">
+              <span class="line-through text-slate-400 light:text-slate-500 font-normal">Semula: {{ formatDate(event.original_date || event.date) }}</span>
+              <span>• ⏳ JADWAL BARU: TO BE ANNOUNCED SHORTLY</span>
+            </div>
+            <div v-else-if="event.status === 'rescheduled'" class="text-amber-300 light:text-amber-800 font-mono font-bold mt-0.5">
+              <span class="line-through text-slate-400 font-normal">Semula: {{ formatDate(event.original_date) }}</span>
+              <span> • 📅 Jadwal Baru: {{ formatDate(event.date) }} • ⏰ {{ event.start_time }} {{ event.timezone }}</span>
+            </div>
+            <div v-else class="text-slate-400 light:text-slate-500 mt-0.5">
+              📅 {{ formatDate(event.date) }} • ⏰ {{ event.start_time }} {{ event.timezone }} • 👔 {{ event.dress_code }}
+            </div>
           </div>
           <div class="text-teal-400 light:text-teal-700 font-semibold shrink-0">
             📍 {{ event.venue_name }}
