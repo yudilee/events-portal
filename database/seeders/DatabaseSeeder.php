@@ -214,7 +214,7 @@ class DatabaseSeeder extends Seeder
             'badge_text' => 'Featured Gathering • Aug 27',
             'image_path' => 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1600&q=80',
             'cta_text' => 'Confirm Your Attendance',
-            'cta_url' => '/events/' . $event1->slug . '/register',
+            'cta_url' => '/events/' . $event1->slug,
             'secondary_cta_text' => 'View Full Rundown',
             'secondary_cta_url' => '/events/' . $event1->slug,
             'event_id' => $event1->id,
