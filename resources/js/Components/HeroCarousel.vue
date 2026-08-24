@@ -27,8 +27,25 @@
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         <!-- Left Text & Actions -->
         <div class="lg:col-span-7 space-y-5">
-          <!-- Slide Badge -->
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-teal-500/40 text-teal-300 text-xs font-bold uppercase tracking-widest animate-fadeIn">
+          <!-- Slide Badge (Reschedule & TBA Aware) -->
+          <div
+            v-if="activeSlide.event?.is_date_tba"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/90 border border-cyan-400/70 text-cyan-300 text-xs font-black uppercase tracking-widest animate-fadeIn shadow-lg shadow-cyan-950/50"
+          >
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            <span>⚠️ EVENT RESCHEDULED • TO BE ANNOUNCED (TBA)</span>
+          </div>
+          <div
+            v-else-if="activeSlide.event?.status === 'rescheduled'"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-950/90 border border-amber-400/70 text-amber-300 text-xs font-black uppercase tracking-widest animate-fadeIn shadow-lg shadow-amber-950/50"
+          >
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+            <span>⚠️ EVENT RESCHEDULED • {{ formatDate(activeSlide.event.date) }}</span>
+          </div>
+          <div
+            v-else
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-teal-500/40 text-teal-300 text-xs font-bold uppercase tracking-widest animate-fadeIn"
+          >
             <span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span>
             <span>{{ activeSlide.badge_text || 'Featured Showcase' }}</span>
           </div>
@@ -50,7 +67,7 @@
               :href="activeSlide.cta_url"
               class="px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm bg-gradient-to-r from-teal-500 via-teal-400 to-cyan-400 text-slate-950 shadow-xl shadow-teal-950/60 hover:shadow-teal-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2"
             >
-              <span>{{ activeSlide.cta_text || 'Explore Event' }}</span>
+              <span>{{ activeSlide.event?.is_date_tba ? 'Lihat Pengumuman Reschedule' : (activeSlide.cta_text || 'Explore Event') }}</span>
               <ArrowRight class="w-4 h-4" />
             </Link>
 
@@ -64,15 +81,36 @@
           </div>
         </div>
 
-        <!-- Right Side: Live Countdown or Event Meta Card -->
-        <div v-if="activeSlide.show_countdown && activeSlide.countdown_date" class="lg:col-span-5 flex flex-col items-center lg:items-end justify-center">
+        <!-- Right Side: Live Countdown or Reschedule TBA Card -->
+        <div v-if="activeSlide.event?.is_date_tba" class="lg:col-span-5 flex flex-col items-center lg:items-end justify-center">
+          <div class="rounded-3xl p-6 sm:p-7 border-2 border-cyan-400/80 shadow-2xl bg-gradient-to-b from-slate-950/95 via-slate-900/95 to-slate-950/95 backdrop-blur-xl max-w-md w-full text-center space-y-3 relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+            <div class="flex items-center justify-center gap-2 text-cyan-400">
+              <CalendarClock class="w-4 h-4" />
+              <span class="text-[0.65rem] font-black uppercase tracking-widest block">
+                EVENT UPDATE: RESCHEDULE
+              </span>
+            </div>
+            <div v-if="activeSlide.event.original_date || activeSlide.countdown_date" class="text-xs font-bold text-rose-400/90 line-through">
+              Original Date: {{ formatDate(activeSlide.event.original_date || activeSlide.countdown_date) }}
+            </div>
+            <div class="p-3.5 rounded-2xl bg-cyan-950/60 border border-cyan-500/40 text-base sm:text-lg font-black font-heading text-white tracking-wider animate-pulse">
+              TO BE ANNOUNCED SHORTLY
+            </div>
+            <div class="text-[0.7rem] text-slate-300 font-medium">
+              Seluruh E-Tiket & Registrasi tetap SAH & berlaku
+            </div>
+          </div>
+        </div>
+
+        <div v-else-if="activeSlide.show_countdown && (activeSlide.event?.date || activeSlide.countdown_date)" class="lg:col-span-5 flex flex-col items-center lg:items-end justify-center">
           <div class="rounded-3xl p-5 sm:p-6 border border-teal-500/30 shadow-2xl bg-slate-950/85 backdrop-blur-xl max-w-md w-full text-center space-y-3.5">
             <span class="text-xs font-bold uppercase tracking-widest text-teal-400 block">
-              Event Starts In
+              {{ activeSlide.event?.status === 'rescheduled' ? 'New Event Schedule' : 'Event Starts In' }}
             </span>
             <CountdownTimer
-              :target-date="activeSlide.countdown_date"
-              :target-time="activeSlide.countdown_time || '10:00'"
+              :target-date="activeSlide.event?.date || activeSlide.countdown_date"
+              :target-time="activeSlide.event?.start_time || activeSlide.countdown_time || '10:00'"
             />
             <div class="pt-1.5 border-t border-slate-800/80 text-[0.7rem] text-slate-400">
               Live updates & RSVP pass generator
@@ -127,7 +165,8 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import CountdownTimer from './CountdownTimer.vue';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { formatDate } from '../Utils/date';
+import { ArrowRight, ChevronLeft, ChevronRight, CalendarClock } from 'lucide-vue-next';
 
 const props = defineProps({
   slides: {
