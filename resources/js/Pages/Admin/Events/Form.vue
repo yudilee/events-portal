@@ -240,23 +240,50 @@
               </div>
             </div>
 
-            <!-- TBA Checkbox Option -->
-            <div class="p-3 rounded-xl bg-slate-900/80 light:bg-white border border-amber-500/40">
-              <label class="flex items-center gap-3 cursor-pointer">
-                <input
-                  v-model="form.is_date_tba"
-                  type="checkbox"
-                  class="w-4 h-4 text-amber-500 rounded bg-slate-900 border-amber-600 focus:ring-amber-500"
-                />
-                <div>
-                  <span class="text-xs font-bold text-amber-300 light:text-amber-900 block">
-                    Tanggal Baru Belum Ditentukan (To Be Announced Shortly / TBA)
-                  </span>
-                  <span class="text-[0.7rem] text-slate-400 light:text-slate-600 block">
-                    Centang ini jika tanggal pengganti masih dalam koordinasi internal dan akan diumumkan kemudian.
-                  </span>
-                </div>
+            <!-- Reschedule Option Selector (Set Date vs TBA) -->
+            <div class="space-y-2">
+              <label class="block text-xs font-bold uppercase tracking-wider text-amber-300 light:text-amber-900">
+                Pilih Tipe Penjadwalan Ulang (Reschedule Mode):
               </label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  @click="form.is_date_tba = false"
+                  class="p-3.5 rounded-2xl border text-left transition-all flex items-start gap-3 cursor-pointer"
+                  :class="!form.is_date_tba ? 'bg-amber-500/20 border-amber-400 text-white shadow-md ring-1 ring-amber-400/50' : 'bg-slate-900/60 light:bg-white border-slate-700 light:border-slate-300 text-slate-400 hover:border-slate-500'"
+                >
+                  <div class="w-4 h-4 rounded-full border-2 mt-0.5 flex items-center justify-center shrink-0" :class="!form.is_date_tba ? 'border-amber-400 bg-amber-400' : 'border-slate-600'">
+                    <div v-if="!form.is_date_tba" class="w-1.5 h-1.5 rounded-full bg-slate-950"></div>
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold text-slate-100 light:text-slate-900 flex items-center gap-1.5">
+                      <span>📅 Tetapkan Tanggal Baru (Set Date)</span>
+                    </div>
+                    <div class="text-[0.7rem] text-slate-400 light:text-slate-600 mt-0.5">
+                      Acara sudah memiliki tanggal pengganti dan jam pasti.
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  @click="form.is_date_tba = true"
+                  class="p-3.5 rounded-2xl border text-left transition-all flex items-start gap-3 cursor-pointer"
+                  :class="form.is_date_tba ? 'bg-cyan-500/20 border-cyan-400 text-white shadow-md ring-1 ring-cyan-400/50' : 'bg-slate-900/60 light:bg-white border-slate-700 light:border-slate-300 text-slate-400 hover:border-slate-500'"
+                >
+                  <div class="w-4 h-4 rounded-full border-2 mt-0.5 flex items-center justify-center shrink-0" :class="form.is_date_tba ? 'border-cyan-400 bg-cyan-400' : 'border-slate-600'">
+                    <div v-if="form.is_date_tba" class="w-1.5 h-1.5 rounded-full bg-slate-950"></div>
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold text-slate-100 light:text-slate-900 flex items-center gap-1.5">
+                      <span>⏳ Tanggal Belum Ditentukan (TBA)</span>
+                    </div>
+                    <div class="text-[0.7rem] text-slate-400 light:text-slate-600 mt-0.5">
+                      Tanggal baru akan diumumkan segera (To Be Announced Shortly).
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
